@@ -1,0 +1,87 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div style="padding: 20px;">
+    <h1>Scraper Statistics & System Health</h1>
+    <p>Last Updated: {{ last_updated }}</p>
+
+    <div style="display: flex; gap: 20px; margin-top: 20px;">
+        <!-- Job Stats Card -->
+        <div style="flex: 1; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2>Job Pipeline</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div style="text-align: center; padding: 10px; background: #e3f2fd; border-radius: 5px;">
+                    <h3 style="margin: 0; color: #1976d2;">{{ job_stats.total }}</h3>
+                    <small>Total Scraped</small>
+                </div>
+                <div style="text-align: center; padding: 10px; background: #e8f5e9; border-radius: 5px;">
+                    <h3 style="margin: 0; color: #2e7d32;">{{ job_stats.approved }}</h3>
+                    <small>Approved (Published)</small>
+                </div>
+                <div style="text-align: center; padding: 10px; background: #fff3e0; border-radius: 5px;">
+                    <h3 style="margin: 0; color: #f57c00;">{{ job_stats.new }}</h3>
+                    <small>Pending Review</small>
+                </div>
+                <div style="text-align: center; padding: 10px; background: #ffebee; border-radius: 5px;">
+                    <h3 style="margin: 0; color: #c62828;">{{ job_stats.rejected }}</h3>
+                    <small>Rejected</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connection Health Card -->
+        <div style="flex: 1; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2>API Connection Health</h2>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                <thead>
+                    <tr style="text-align: left; border-bottom: 2px solid #eee;">
+                        <th style="padding: 10px;">Source</th>
+                        <th style="padding: 10px;">Status</th>
+                        <th style="padding: 10px;">Last Scrape</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for source in source_stats %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 10px;">
+                            <strong>{{ source.name }}</strong>
+                            <br><small>{{ source.connection_msg }}</small>
+                        </td>
+                        <td style="padding: 10px;">
+                            {% if source.connection_status == True %}
+                                <span style="color: green; font-weight: bold;">● Online</span>
+                            {% elif source.connection_status == False %}
+                                <span style="color: red; font-weight: bold;">● Offline</span>
+                            {% else %}
+                                <span style="color: gray;">● Unknown</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 10px;">{{ source.last_scraped|default:"Never" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- API Configs -->
+    <div style="margin-top: 20px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h2>API Configurations</h2>
+        <ul>
+            {% for config in api_configs %}
+            <li>
+                <strong>{{ config.get_service_name_display }}</strong>: 
+                {% if config.is_active %}
+                    <span style="color: green;">Active</span>
+                {% else %}
+                    <span style="color: red;">Inactive</span>
+                {% endif %}
+                (Key ends in ...{{ config.api_key|slice:"-4:" }})
+            </li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'admin:core_apiconfiguration_changelist' %}" class="button">Manage Keys</a>
+    </div>
+</div>
+{% endblock %}

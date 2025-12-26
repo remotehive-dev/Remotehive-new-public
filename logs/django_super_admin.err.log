@@ -1,31 +1,77 @@
 Watching for file changes with StatReloader
-[25/Dec/2025 15:29:51] "GET /admin/core/job/ HTTP/1.1" 200 38291
-[25/Dec/2025 15:29:51] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
-[25/Dec/2025 19:54:23] "GET /admin/ HTTP/1.1" 200 33007
-[25/Dec/2025 19:54:23] "GET /static/vendor/adminlte/css/adminlte.min.css HTTP/1.1" 304 0
-[25/Dec/2025 19:54:23] "GET /static/vendor/fontawesome-free/css/all.min.css HTTP/1.1" 304 0
-[25/Dec/2025 19:54:23] "GET /static/jazzmin/css/main.css HTTP/1.1" 304 0
-[25/Dec/2025 19:54:23] "GET /static/img/logo.png HTTP/1.1" 304 0
-[25/Dec/2025 19:54:23] "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:23] "GET /static/jazzmin/js/main.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:23] "GET /static/jazzmin/js/ui-builder.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:23] "GET /static/vendor/bootstrap/js/bootstrap.min.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:23] "GET /static/vendor/adminlte/js/adminlte.min.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:31] "GET /admin/core/job/ HTTP/1.1" 200 38291
-[25/Dec/2025 19:54:31] "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:31] "GET /static/vendor/select2/css/select2.min.css HTTP/1.1" 304 0
-[25/Dec/2025 19:54:31] "GET /static/admin/js/core.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:31] "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:31] "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:31] "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:31] "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:31] "GET /static/admin/js/actions.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:31] "GET /static/jazzmin/js/change_list.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:31] "GET /static/vendor/select2/js/select2.min.js HTTP/1.1" 304 0
-[25/Dec/2025 19:54:31] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
-[25/Dec/2025 19:54:34] "GET /admin/core/job/?q= HTTP/1.1" 200 38354
-[25/Dec/2025 19:54:34] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
-[25/Dec/2025 19:54:46] "GET /admin/core/job/?source=employer&status__exact=published&job_type__exact=full_time&q= HTTP/1.1" 200 38459
-[25/Dec/2025 19:54:46] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
-[25/Dec/2025 19:54:53] "GET /admin/core/job/ HTTP/1.1" 200 38291
-[25/Dec/2025 19:54:53] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[26/Dec/2025 13:06:04] "GET / HTTP/1.1" 302 0
+[26/Dec/2025 13:06:04] "GET / HTTP/1.1" 302 0
+[26/Dec/2025 13:06:04] "GET /admin/ HTTP/1.1" 200 40110
+[26/Dec/2025 13:06:04] "GET /admin/ HTTP/1.1" 200 40110
+[26/Dec/2025 13:06:07] "GET /admin/autoscraper/scrapersource/ HTTP/1.1" 200 41569
+[26/Dec/2025 13:06:07] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[26/Dec/2025 13:06:16] "GET /admin/autoscraper/scrapedjob/ HTTP/1.1" 200 64737
+[26/Dec/2025 13:06:16] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[26/Dec/2025 13:06:20] "GET /admin/autoscraper/scrapedjob/?posted_date__day=25&posted_date__month=12&posted_date__year=2025 HTTP/1.1" 200 66758
+[26/Dec/2025 13:06:20] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[26/Dec/2025 13:06:23] "GET /admin/autoscraper/scrapedjob/?posted_date__month=12&posted_date__year=2025 HTTP/1.1" 200 66828
+[26/Dec/2025 13:06:23] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+Error fetching from LinkedIn API: 404 Client Error: Not Found for url: https://linkedin-job-search-api.p.rapidapi.com/?limit=10&offset=0&title_filter=%22Data+Engineer%22&location_filter=%22United+States%22+OR+%22United+Kingdom%22&description_type=text
+[26/Dec/2025 13:06:30] "GET /admin/autoscraper/scrapedjob/fetch-all/ HTTP/1.1" 302 0
+[26/Dec/2025 13:06:30] "GET /admin/autoscraper/scrapedjob/ HTTP/1.1" 200 75998
+[26/Dec/2025 13:06:30] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[26/Dec/2025 13:06:47] "POST /admin/autoscraper/scrapedjob/ HTTP/1.1" 302 0
+[26/Dec/2025 13:06:47] "GET /admin/autoscraper/scrapedjob/ HTTP/1.1" 200 75318
+[26/Dec/2025 13:06:47] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[26/Dec/2025 13:07:05] "GET /admin/autoscraper/scrapedjob/stats/ HTTP/1.1" 200 29850
+[26/Dec/2025 13:07:11] "GET /admin/autoscraper/scrapedjob/ HTTP/1.1" 200 74748
+[26/Dec/2025 13:07:13] "GET /admin/autoscraper/targetcompany/ HTTP/1.1" 200 130377
+[26/Dec/2025 13:07:13] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[26/Dec/2025 13:07:18] "GET /admin/autoscraper/scrapedjob/ HTTP/1.1" 200 74748
+[26/Dec/2025 13:07:20] "GET /admin/core/apiconfiguration/ HTTP/1.1" 200 42627
+[26/Dec/2025 13:07:20] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[26/Dec/2025 13:07:25] "GET /admin/core/apiconfiguration/test-connection/1/ HTTP/1.1" 302 0
+[26/Dec/2025 13:07:25] "GET /admin/core/apiconfiguration/ HTTP/1.1" 200 43147
+[26/Dec/2025 13:07:25] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[26/Dec/2025 13:07:27] "GET /admin/core/apiconfiguration/test-connection/3/ HTTP/1.1" 302 0
+[26/Dec/2025 13:07:27] "GET /admin/core/apiconfiguration/ HTTP/1.1" 200 43280
+[26/Dec/2025 13:07:27] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/services.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/services.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/services.py changed, reloading.
+Watching for file changes with StatReloader
+[26/Dec/2025 13:11:46] "GET /admin/core/apiconfiguration/test-connection/3/ HTTP/1.1" 302 0
+[26/Dec/2025 13:11:46] "GET /admin/core/apiconfiguration/ HTTP/1.1" 200 43280
+[26/Dec/2025 13:11:46] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/services.py changed, reloading.
+Watching for file changes with StatReloader
+[26/Dec/2025 13:11:50] "GET /admin/ HTTP/1.1" 200 40111
+[26/Dec/2025 13:14:16] "GET /admin/core/apiconfiguration/ HTTP/1.1" 200 42626
+[26/Dec/2025 13:14:16] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[26/Dec/2025 13:14:20] "GET /admin/core/apiconfiguration/test-connection/3/ HTTP/1.1" 302 0
+[26/Dec/2025 13:14:20] "GET /admin/core/apiconfiguration/ HTTP/1.1" 200 43161
+[26/Dec/2025 13:14:20] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[26/Dec/2025 13:14:24] "GET /admin/autoscraper/scrapedjob/ HTTP/1.1" 200 76702
+[26/Dec/2025 13:14:24] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[26/Dec/2025 13:14:33] "GET /admin/autoscraper/scrapedjob/?source__id__exact=3&q= HTTP/1.1" 200 50863
+[26/Dec/2025 13:14:33] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+[26/Dec/2025 13:14:51] "POST /admin/autoscraper/scrapedjob/?source__id__exact=3&q= HTTP/1.1" 302 0
+[26/Dec/2025 13:14:51] "GET /admin/autoscraper/scrapedjob/?source__id__exact=3&q= HTTP/1.1" 200 51387
+[26/Dec/2025 13:14:51] "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/services.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/services.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/services.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/services.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/admin.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/admin.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My Drive/remotehive/Remotehive-main/Remotehive new/backend_django/autoscraper/models.py changed, reloading.
+Watching for file changes with StatReloader

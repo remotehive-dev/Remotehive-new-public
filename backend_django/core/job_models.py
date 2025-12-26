@@ -27,8 +27,29 @@ class Job(models.Model):
     description = models.TextField()
     requirements = models.TextField(blank=True)
     benefits = models.TextField(blank=True)
+    apply_url = models.URLField(blank=True, null=True, help_text="External link for application (if applicable)")
     
+    # New Fields for Enhanced Features
+    job_reference_id = models.CharField(max_length=20, unique=True, blank=True, null=True, help_text="Unique Reference ID e.g., RH-1234")
+    application_method = models.CharField(
+        max_length=20, 
+        choices=[('external', 'External URL'), ('internal', 'On RemoteHive')],
+        default='external'
+    )
+
     status = models.CharField(max_length=20, choices=JOB_STATUS_CHOICES, default='draft')
+
+    def save(self, *args, **kwargs):
+        if not self.job_reference_id:
+            # Generate Unique ID
+            import random
+            import string
+            while True:
+                uid = 'RH-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+                if not Job.objects.filter(job_reference_id=uid).exists():
+                    self.job_reference_id = uid
+                    break
+        super().save(*args, **kwargs)
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posted_jobs')
     
     views_count = models.IntegerField(default=0)

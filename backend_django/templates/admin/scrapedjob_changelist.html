@@ -1,0 +1,16 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block object-tools-items %}
+    {{ block.super }}
+    <li>
+        <a href="stats/" class="btn" style="background-color: #28a745; color: white; margin-left: 10px;">
+            <i class="fas fa-chart-line"></i> View Scraper Stats
+        </a>
+    </li>
+    <li>
+        <a href="fetch-all/" class="btn btn-primary" style="margin-left: 10px;">
+            <i class="fas fa-cloud-download-alt"></i> Fetch Data Engineer Jobs (US/UK)
+        </a>
+    </li>
+{% endblock %}

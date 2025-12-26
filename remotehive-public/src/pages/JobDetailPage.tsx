@@ -5,6 +5,7 @@ import { useUser, useAuth } from "@clerk/clerk-react";
 import { Job } from '../types';
 import { getJob, getUserByClerkId } from '../lib/api';
 import { getMissingMandatoryFields } from '../lib/profileScore';
+import sanitizeHtml from 'sanitize-html';
 
 export function JobDetailPage() {
   const { id } = useParams();
@@ -39,6 +40,18 @@ export function JobDetailPage() {
   const handleApply = async () => {
     if (!job) return;
     
+    // Internal Application Flow
+    if (job.application_method === 'internal') {
+        if (!user) {
+             navigate('/sign-in?redirect_url=' + encodeURIComponent(window.location.pathname));
+             return;
+        }
+        // Redirect to internal application page (to be implemented)
+        navigate(`/jobs/${job.id}/apply`);
+        return;
+    }
+
+    // External Application Flow (Default)
     if (!user) {
       // Redirect to login if not logged in
       navigate('/sign-in?redirect_url=' + encodeURIComponent(window.location.pathname));
@@ -76,6 +89,19 @@ export function JobDetailPage() {
     }
   };
 
+  const parseList = (items: string[] | undefined) => {
+    if (!items || items.length === 0) return [];
+    // If single item contains newlines, split it
+    if (items.length === 1 && items[0].includes('\n')) {
+      return items[0]
+        .split('\n')
+        .map(i => i.trim())
+        .filter(i => i.length > 0)
+        .map(i => i.replace(/^[-•*]\s*/, '').trim());
+    }
+    return items;
+  };
+
   if (isLoading || !isAuthLoaded) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50">
@@ -94,6 +120,10 @@ export function JobDetailPage() {
       </div>
     );
   }
+
+  const isHtml = /<[a-z][\s\S]*>/i.test(job.description || '');
+  const requirements = parseList(job.requirements);
+  const benefits = parseList(job.benefits);
 
   return (
     <div className="bg-slate-50 min-h-screen py-8 relative">
@@ -151,7 +181,7 @@ export function JobDetailPage() {
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         
         {/* Back Link */}
-        <Link to="/jobs" className="mb-6 inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600">
+        <Link to="/jobs" className="mb-8 inline-flex items-center text-sm font-semibold text-slate-500 hover:text-indigo-600 transition-colors">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Jobs
         </Link>
@@ -161,41 +191,46 @@ export function JobDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             
             {/* Job Header */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 transition-shadow hover:shadow-md">
               <div className="flex items-start justify-between gap-4">
-                <div className="flex gap-4">
-                  <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-white p-2">
+                <div className="flex gap-5">
+                  <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-white p-2 shadow-sm">
                     {job.company_logo_url ? (
-                      <img src={job.company_logo_url} alt={job.company_name} className="h-full w-full object-contain" />
+                      <img src={job.company_logo_url} alt={job.company_name} className="h-full w-full object-contain rounded-lg" />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-slate-100 text-2xl font-bold text-slate-400">
+                      <div className="flex h-full w-full items-center justify-center bg-indigo-50 text-2xl font-bold text-indigo-600 rounded-lg">
                         {job.company_name.charAt(0)}
                       </div>
                     )}
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold text-slate-900">{job.title}</h1>
-                    <div className="mt-1 flex items-center gap-2 text-slate-600">
-                      <span className="font-medium">{job.company_name}</span>
-                      <span>•</span>
+                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{job.title}</h1>
+                    <div className="mt-2 flex items-center gap-2 text-slate-600 font-medium">
+                      <span className="text-slate-900">{job.company_name}</span>
+                      <span className="text-slate-300">•</span>
                       <span className="text-sm">{job.location}</span>
                     </div>
                   </div>
                 </div>
-                <button className="rounded-full p-2 text-slate-400 hover:bg-slate-50 hover:text-indigo-600">
+                <button className="rounded-full p-2.5 text-slate-400 hover:bg-slate-50 hover:text-indigo-600 transition-colors border border-transparent hover:border-slate-200">
                   <Share2 className="h-5 w-5" />
                 </button>
               </div>
 
-              <div className="mt-6 flex flex-wrap gap-4 border-t border-slate-100 pt-6">
-                <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-sm font-medium text-slate-700">
+              <div className="mt-8 flex flex-wrap gap-3 border-t border-slate-100 pt-6">
+                <div className="flex items-center gap-2 rounded-full bg-slate-50 px-4 py-1.5 text-sm font-semibold text-slate-700 border border-slate-200">
                   <Briefcase className="h-4 w-4 text-slate-400" />
                   {job.type}
                 </div>
                 {job.workplace_type && (
-                  <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-sm font-medium text-slate-700 capitalize">
+                  <div className="flex items-center gap-2 rounded-full bg-slate-50 px-4 py-1.5 text-sm font-semibold text-slate-700 border border-slate-200 capitalize">
                     <Globe className="h-4 w-4 text-slate-400" />
                     {job.workplace_type}
+                  </div>
+                )}
+                {job.job_reference_id && (
+                  <div className="flex items-center gap-2 rounded-full bg-slate-50 px-4 py-1.5 text-sm font-semibold text-slate-500 border border-slate-200 font-mono">
+                    ID: {job.job_reference_id}
                   </div>
                 )}
                 {job.salary_range && (
@@ -230,14 +265,18 @@ export function JobDetailPage() {
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
               <h2 className="text-xl font-bold text-slate-900">Job Description</h2>
               <div className="mt-4 prose prose-slate max-w-none text-slate-600">
-                <p className="whitespace-pre-line">{job.description}</p>
+                 {isHtml ? (
+                    <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(job.description || '') }} />
+                 ) : (
+                    <p className="whitespace-pre-line">{job.description}</p>
+                 )}
               </div>
 
-              {job.requirements && job.requirements.length > 0 && (
+              {requirements && requirements.length > 0 && (
                 <>
                   <h3 className="mt-8 text-lg font-bold text-slate-900">Requirements</h3>
                   <ul className="mt-4 space-y-2">
-                    {job.requirements.map((req, idx) => (
+                    {requirements.map((req, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-slate-600">
                         <div className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-indigo-600" />
                         <span>{req}</span>
@@ -247,11 +286,11 @@ export function JobDetailPage() {
                 </>
               )}
 
-              {job.benefits && job.benefits.length > 0 && (
+              {benefits && benefits.length > 0 && (
                 <>
                   <h3 className="mt-8 text-lg font-bold text-slate-900">Benefits</h3>
                   <ul className="mt-4 space-y-2">
-                    {job.benefits.map((benefit, idx) => (
+                    {benefits.map((benefit, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-slate-600">
                         <div className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500" />
                         <span>{benefit}</span>

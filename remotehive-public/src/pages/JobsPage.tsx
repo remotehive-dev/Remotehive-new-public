@@ -37,16 +37,16 @@ export function JobsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8 neu-card p-8">
-        <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Browse Jobs</h1>
-        <p className="mt-2 text-gray-600 font-medium">
-          Showing <span className="text-neu-accent font-bold">{jobs.length}</span> open positions based on your criteria
+      <div className="mb-8 rounded-2xl bg-white p-8 shadow-sm border border-slate-200">
+        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Browse Jobs</h1>
+        <p className="mt-2 text-slate-600 font-medium">
+          Showing <span className="text-indigo-600 font-bold">{jobs.length}</span> open positions based on your criteria
         </p>
       </div>
 
       {isLoading ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="h-10 w-10 animate-spin text-neu-accent" />
+          <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
         </div>
       ) : (
         <JobList jobs={jobs} />

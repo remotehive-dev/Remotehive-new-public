@@ -1,13 +1,8 @@
-60079:C 25 Dec 2025 20:59:31.624 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
-60079:C 25 Dec 2025 20:59:31.624 * Redis version=8.2.1, bits=64, commit=00000000, modified=1, pid=60079, just started
-60079:C 25 Dec 2025 20:59:31.624 * Configuration loaded
-60079:M 25 Dec 2025 20:59:31.625 * monotonic clock: POSIX clock_gettime
-60079:M 25 Dec 2025 20:59:31.628 * Running mode=standalone, port=6379.
-60079:M 25 Dec 2025 20:59:31.628 # WARNING: The TCP backlog setting of 511 cannot be enforced because kern.ipc.somaxconn is set to the lower value of 128.
-60079:M 25 Dec 2025 20:59:31.629 * Server initialized
-60079:M 25 Dec 2025 20:59:31.630 * Loading RDB produced by version 8.2.1
-60079:M 25 Dec 2025 20:59:31.630 * RDB age 12 seconds
-60079:M 25 Dec 2025 20:59:31.630 * RDB memory usage when created 0.78 Mb
-60079:M 25 Dec 2025 20:59:31.630 * Done loading RDB, keys loaded: 0, keys expired: 0.
-60079:M 25 Dec 2025 20:59:31.630 * DB loaded from disk: 0.000 seconds
-60079:M 25 Dec 2025 20:59:31.630 * Ready to accept connections tcp
+69383:C 26 Dec 2025 18:34:47.407 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+69383:C 26 Dec 2025 18:34:47.407 * Redis version=8.2.1, bits=64, commit=00000000, modified=1, pid=69383, just started
+69383:C 26 Dec 2025 18:34:47.407 * Configuration loaded
+69383:M 26 Dec 2025 18:34:47.408 * monotonic clock: POSIX clock_gettime
+69383:M 26 Dec 2025 18:34:47.410 * Running mode=standalone, port=6379.
+69383:M 26 Dec 2025 18:34:47.410 # WARNING: The TCP backlog setting of 511 cannot be enforced because kern.ipc.somaxconn is set to the lower value of 128.
+69383:M 26 Dec 2025 18:34:47.411 # Warning: Could not create server TCP listening socket *:6379: bind: Address already in use
+69383:M 26 Dec 2025 18:34:47.411 # Failed listening on port 6379 (tcp), aborting.

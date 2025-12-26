@@ -1,6 +1,28 @@
 from django.db import models
 from django.utils.html import format_html
 
+class Company(models.Model):
+    """Centralized company information with logo"""
+    name = models.CharField(max_length=255, unique=True, db_index=True)
+    domain = models.CharField(max_length=255, blank=True, null=True, help_text="Company domain for logo fetch")
+    logo_url = models.URLField(max_length=500, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
+    
+    # Logo fetching metadata
+    logo_last_fetched = models.DateTimeField(null=True, blank=True)
+    logo_fetch_failed = models.BooleanField(default=False, help_text="True if logo fetch failed")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name_plural = "Companies"
+        ordering = ['name']
+
 class ScraperSource(models.Model):
     name = models.CharField(max_length=255)
     url = models.URLField()
@@ -8,6 +30,17 @@ class ScraperSource(models.Model):
     last_scraped = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.name
+
+class TargetCompany(models.Model):
+    name = models.CharField(max_length=255)
+    website = models.URLField(blank=True, null=True)
+    logo_url = models.URLField(blank=True, null=True)
+    region = models.CharField(max_length=255, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    last_scraped_at = models.DateTimeField(null=True, blank=True)
+    
     def __str__(self):
         return self.name
 
@@ -21,7 +54,8 @@ class ScrapedJob(models.Model):
 
     source = models.ForeignKey(ScraperSource, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    company = models.CharField(max_length=255)
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True, related_name='jobs')
+    company_text = models.CharField(max_length=255, default="Unknown", help_text="Backup company name from scraper")
     location = models.CharField(max_length=255)
     url = models.URLField()
     description = models.TextField()
@@ -37,7 +71,8 @@ class ScrapedJob(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.title} at {self.company}"
+        company_name = self.company.name if self.company else self.company_text
+        return f"{self.title} at {company_name}"
 
     def status_badge(self):
         color = 'gray'

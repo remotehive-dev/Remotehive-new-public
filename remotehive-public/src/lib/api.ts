@@ -15,6 +15,7 @@ export async function getJobs(filters?: {
   role?: string;
   location?: string;
   type?: string;
+  companyId?: string;
 }): Promise<Job[]> {
   const supabase = getSupabase();
   let query = supabase
@@ -46,6 +47,10 @@ export async function getJobs(filters?: {
 
   if (filters?.type) {
     query = query.eq('type', filters.type);
+  }
+
+  if (filters?.companyId) {
+    query = query.eq('company_id', filters.companyId);
   }
   
   // Role filtering is tricky with tags array, simplified for now
@@ -121,7 +126,9 @@ export async function getJob(id: string): Promise<Job | null> {
     application_url: jobData.application_url,
     description: jobData.description,
     requirements: jobData.requirements,
-    benefits: jobData.benefits
+    benefits: jobData.benefits,
+    job_reference_id: jobData.job_reference_id,
+    application_method: jobData.application_method
   } as Job;
 }
 
@@ -135,6 +142,22 @@ export async function getCompanies() {
   if (error) {
     console.error('Error fetching companies:', error);
     return [];
+  }
+
+  return data;
+}
+
+export async function getCompany(id: string) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('companies')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error('Error fetching company:', error);
+    return null;
   }
 
   return data;

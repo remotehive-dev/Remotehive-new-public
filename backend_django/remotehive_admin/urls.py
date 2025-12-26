@@ -18,10 +18,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.views.generic.base import RedirectView
-from core.views import api_docs_view
+from core.views import api_docs_view, proxy_openapi
 
 urlpatterns = [
     path("", RedirectView.as_view(url="admin/", permanent=False)),
     path("admin/api/docs/", api_docs_view, name="api_docs"),
+    path("admin/api/schema/", proxy_openapi, name="api_schema_proxy"),
     path("admin/", admin.site.urls),
 ]

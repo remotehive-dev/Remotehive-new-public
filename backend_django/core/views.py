@@ -19,3 +19,13 @@ def api_docs_view(request):
         "site_header": getattr(settings, 'JAZZMIN_SETTINGS', {}).get('site_header', 'RemoteHive'),
     }
     return render(request, "admin/api_docs.html", context)
+
+@staff_member_required
+def proxy_openapi(request):
+    import requests
+    from django.http import JsonResponse, HttpResponse
+    try:
+        response = requests.get("http://localhost:8000/api/v1/openapi.json")
+        return JsonResponse(response.json(), safe=False)
+    except Exception as e:
+        return HttpResponse(f"Error connecting to FastAPI: {e}", status=502)

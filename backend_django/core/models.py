@@ -4,6 +4,32 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .job_models import Job
 
+class APIConfiguration(models.Model):
+    SERVICE_LABELS = {
+        "serp": "SERP API (Google Jobs)",
+        "rapidapi": "RapidAPI (Active Jobs DB)",
+        "linkedin": "RapidAPI (LinkedIn Job Search)",
+    }
+    service_name = models.CharField(
+        max_length=50,
+        unique=True,
+        help_text="Service key like 'serp', 'rapidapi', 'linkedin', or a custom value",
+    )
+    api_key = models.CharField(max_length=255)
+    base_url = models.URLField(blank=True, null=True, help_text="Optional base URL override")
+    is_active = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def get_service_name_display(self):
+        return self.SERVICE_LABELS.get(self.service_name, self.service_name)
+
+    def __str__(self):
+        return self.get_service_name_display()
+
+    class Meta:
+        verbose_name = "API Key Configuration"
+        verbose_name_plural = "API Key Configurations"
+
 class UserProfile(models.Model):
     ROLE_CHOICES = (
         ('admin', 'Admin'),

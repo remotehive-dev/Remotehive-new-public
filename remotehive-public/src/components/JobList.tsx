@@ -8,9 +8,9 @@ interface JobListProps {
 export function JobList({ jobs }: JobListProps) {
   if (jobs.length === 0) {
     return (
-      <div className="flex h-64 flex-col items-center justify-center neu-card border-dashed border-2 border-gray-300">
-        <p className="text-lg font-bold text-gray-800">No jobs found</p>
-        <p className="text-sm text-gray-500">Try adjusting your filters or search query.</p>
+      <div className="flex h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50">
+        <p className="text-lg font-bold text-slate-800">No jobs found</p>
+        <p className="text-sm text-slate-500">Try adjusting your filters or search query.</p>
       </div>
     );
   }

@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     # Clerk
     CLERK_SECRET_KEY: Optional[str] = None
     
+    # Internal Auth
+    ADMIN_SECRET_KEY: str = "RemoteHiveSecretKey2025"
+
     class Config:
         env_file = ".env"
         case_sensitive = True

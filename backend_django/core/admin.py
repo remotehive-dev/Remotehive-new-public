@@ -1,8 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.html import format_html
-from .models import UserProfile, EmployerUser, JobSeekerUser, AdminUser
+from django.contrib import messages
+import re
+from .models import UserProfile, EmployerUser, JobSeekerUser, AdminUser, APIConfiguration
+from autoscraper.services import test_api_connection
 
 # Define an inline admin descriptor for UserProfile model
 class UserProfileInline(admin.StackedInline):
@@ -138,3 +143,83 @@ admin.site.register(AdminUser, AdminUserAdmin)
 # Register Job Admin
 from .job_admin import JobAdmin
 
+class APIConfigurationAdminForm(forms.ModelForm):
+    service_name = forms.CharField(
+        max_length=50,
+        help_text="Use a short key like 'serp', 'rapidapi', 'linkedin', or your own (lowercase).",
+        widget=forms.TextInput(attrs={"placeholder": "e.g. linkedin"}),
+    )
+
+    class Meta:
+        model = APIConfiguration
+        fields = "__all__"
+
+    def clean_service_name(self):
+        raw_value = (self.cleaned_data.get("service_name") or "").strip()
+        normalized = raw_value.lower()
+        normalized = re.sub(r"\s+", "_", normalized)
+        normalized = re.sub(r"[^a-z0-9_-]", "", normalized)
+        if not normalized:
+            raise ValidationError("Service name is required.")
+        if "linkedin" in normalized:
+            return "linkedin"
+        if normalized in {"serpapi", "serp_api"} or "serp" == normalized:
+            return "serp"
+        if normalized in {"rapid", "rapid_api"} or "rapid" in normalized:
+            return "rapidapi"
+        return normalized
+
+@admin.register(APIConfiguration)
+class APIConfigurationAdmin(admin.ModelAdmin):
+    form = APIConfigurationAdminForm
+    list_display = ('service_name', 'is_active', 'updated_at', 'test_connection_btn')
+    list_filter = ('service_name', 'is_active')
+    search_fields = ('service_name',)
+    fieldsets = (
+        ('Service Details', {
+            'fields': ('service_name', 'is_active')
+        }),
+        ('Credentials', {
+            'fields': ('api_key', 'base_url'),
+            'description': "Enter the API key and optional base URL provided by the service provider."
+        }),
+    )
+    actions = ['test_connection_action']
+
+    def test_connection_btn(self, obj):
+        return format_html(
+            '<a class="button" href="test-connection/{}/">Test Connection</a>',
+            obj.id
+        )
+    test_connection_btn.short_description = "Action"
+    test_connection_btn.allow_tags = True
+
+    def test_connection_action(self, request, queryset):
+        for config in queryset:
+            success, message = test_api_connection(config.service_name)
+            if success:
+                self.message_user(request, f"{config.service_name}: {message}", level=messages.SUCCESS)
+            else:
+                self.message_user(request, f"{config.service_name}: {message}", level=messages.ERROR)
+    test_connection_action.short_description = "Test Connection for Selected APIs"
+
+    # Add custom URL for the button (optional, but cleaner)
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path('test-connection/<int:pk>/', self.admin_site.admin_view(self.test_connection_view), name='api-test-connection'),
+        ]
+        return custom_urls + urls
+
+    def test_connection_view(self, request, pk):
+        from django.shortcuts import get_object_or_404, redirect
+        config = get_object_or_404(APIConfiguration, pk=pk)
+        success, message = test_api_connection(config.service_name)
+        
+        if success:
+            self.message_user(request, f"{config.service_name}: {message}", level=messages.SUCCESS)
+        else:
+            self.message_user(request, f"{config.service_name}: {message}", level=messages.ERROR)
+            
+        return redirect(request.META.get('HTTP_REFERER', 'admin:core_apiconfiguration_changelist'))

@@ -4,33 +4,52 @@ from django.contrib.auth import get_user_model
 from autoscraper.models import ScrapedJob
 from leads.models import Lead
 from core.models import UserProfile
+from core.job_models import Job
 
 def get_dashboard_stats():
     stats = {
-        "users_count": 0,
-        "jobs_count": 0,
+        # Users
+        "users_total": 0,
+        "users_employers": 0,
+        "users_jobseekers": 0,
+        
+        # Internal Jobs
+        "jobs_internal_total": 0,
+        "jobs_internal_published": 0,
+        "jobs_internal_draft": 0,
+        
+        # Scraped Jobs
+        "jobs_scraped_total": 0,
+        "jobs_scraped_new": 0,
+        
+        # Other
         "leads_count": 0,
-        "active_campaigns": 0
     }
 
-    # 1. Fetch Users from Local Django DB (Synced from Clerk)
     try:
         User = get_user_model()
-        stats['users_count'] = User.objects.count()
+        stats['users_total'] = User.objects.count()
+        stats['users_employers'] = UserProfile.objects.filter(role='employer').count()
+        stats['users_jobseekers'] = UserProfile.objects.filter(role='jobseeker').count()
     except Exception as e:
-        print(f"DB Error: {e}")
-        stats['users_count'] = "Error"
+        print(f"User Stats Error: {e}")
 
-    # 2. Fetch Jobs from AutoScraper (Local SQLite)
     try:
-        stats['jobs_count'] = ScrapedJob.objects.count()
+        stats['jobs_internal_total'] = Job.objects.count()
+        stats['jobs_internal_published'] = Job.objects.filter(status='published').count()
+        stats['jobs_internal_draft'] = Job.objects.filter(status='draft').count()
     except Exception as e:
-        print(f"DB Error: {e}")
+        print(f"Internal Job Stats Error: {e}")
 
-    # 3. Fetch Leads (Local SQLite)
+    try:
+        stats['jobs_scraped_total'] = ScrapedJob.objects.count()
+        stats['jobs_scraped_new'] = ScrapedJob.objects.filter(status='new').count()
+    except Exception as e:
+        print(f"Scraped Job Stats Error: {e}")
+
     try:
         stats['leads_count'] = Lead.objects.count()
     except Exception as e:
-        print(f"DB Error: {e}")
+        print(f"Leads Stats Error: {e}")
         
     return stats
