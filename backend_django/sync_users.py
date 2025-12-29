@@ -1,10 +1,19 @@
 import os
 import requests
 import django
+import dotenv
+from pathlib import Path
 
-# Hardcoded Clerk Secret Key from previous context
-CLERK_SECRET_KEY = "sk_test_9RIOwNRJQLvIeT1J6j9NQsmeoGZrRDlUD7bxcJji4l"
+# Load environment variables from .env file
+BASE_DIR = Path(__file__).resolve().parent.parent
+dotenv.load_dotenv(BASE_DIR / ".env")
+
+# Clerk Configuration
+CLERK_SECRET_KEY = os.environ.get("CLERK_SECRET_KEY")
 CLERK_API_URL = "https://api.clerk.com/v1/users"
+
+if not CLERK_SECRET_KEY:
+    print("Warning: CLERK_SECRET_KEY not found in environment variables.")
 
 def sync_clerk_users():
     if __name__ == "__main__":

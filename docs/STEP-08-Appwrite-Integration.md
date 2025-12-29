@@ -6,8 +6,8 @@
 - Implement dynamic Resume Template loading.
 
 ## Configuration
-- **Appwrite Endpoint**: `https://sgp.cloud.appwrite.io/v1`
-- **Project ID**: `6940f8d80028726e3ed2`
+- **Appwrite Endpoint**: `https://cloud.appwrite.io/v1`
+- **Project ID**: `YOUR_PROJECT_ID`
 - **Buckets**:
   - `Jobseeker-Resume`: Stores candidate PDF uploads.
   - `Resume-Templates`: Stores template preview images and assets.
