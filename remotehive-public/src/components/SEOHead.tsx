@@ -45,8 +45,8 @@ export function SEOHead() {
           return null;
       })}
 
-      {/* Marketing / Ads Scripts */}
-      {config.marketing?.map((item, index) => {
+      {/* Marketing / Ads Scripts (Production Only) */}
+      {import.meta.env.PROD && config.marketing?.map((item, index) => {
         // Meta Pixel (Facebook/Instagram)
         if (item.provider === 'meta' && item.pixel_id) {
           return (

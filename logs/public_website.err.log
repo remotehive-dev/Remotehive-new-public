@@ -1,0 +1,14 @@
+You are using Node.js 20.11.0. Vite requires Node.js version 20.19+ or 22.12+. Please upgrade your Node.js version.
+error when starting dev server:
+TypeError: crypto.hash is not a function
+    at getHash (file:///Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My%20Drive/remotehive/Remotehive-main/Remotehive%20new/remotehive-public/node_modules/vite/dist/node/chunks/config.js:2444:19)
+    at getLockfileHash (file:///Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My%20Drive/remotehive/Remotehive-main/Remotehive%20new/remotehive-public/node_modules/vite/dist/node/chunks/config.js:32382:9)
+    at getDepHash (file:///Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My%20Drive/remotehive/Remotehive-main/Remotehive%20new/remotehive-public/node_modules/vite/dist/node/chunks/config.js:32385:23)
+    at initDepsOptimizerMetadata (file:///Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My%20Drive/remotehive/Remotehive-main/Remotehive%20new/remotehive-public/node_modules/vite/dist/node/chunks/config.js:31844:53)
+    at createDepsOptimizer (file:///Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My%20Drive/remotehive/Remotehive-main/Remotehive%20new/remotehive-public/node_modules/vite/dist/node/chunks/config.js:34032:17)
+    at new DevEnvironment (file:///Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My%20Drive/remotehive/Remotehive-main/Remotehive%20new/remotehive-public/node_modules/vite/dist/node/chunks/config.js:34806:109)
+    at Object.defaultCreateClientDevEnvironment [as createEnvironment] (file:///Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My%20Drive/remotehive/Remotehive-main/Remotehive%20new/remotehive-public/node_modules/vite/dist/node/chunks/config.js:35218:9)
+    at file:///Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My%20Drive/remotehive/Remotehive-main/Remotehive%20new/remotehive-public/node_modules/vite/dist/node/chunks/config.js:25389:52
+    at Array.map (<anonymous>)
+    at _createServer (file:///Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My%20Drive/remotehive/Remotehive-main/Remotehive%20new/remotehive-public/node_modules/vite/dist/node/chunks/config.js:25388:58)
+    at async CAC.<anonymous> (file:///Users/ranjeettiwary/Library/CloudStorage/GoogleDrive-remotehive.official@gmail.com/My%20Drive/remotehive/Remotehive-main/Remotehive%20new/remotehive-public/node_modules/vite/dist/node/cli.js:572:18)
