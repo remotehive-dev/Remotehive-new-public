@@ -1,7 +1,7 @@
 providers = ["python"]
 
 [phases.setup]
-nixPkgs = ["python3", "gcc"]
+nixPkgs = ["python3", "gcc", "python311Packages.pip"]
 
 [phases.install]
 cmds = ["python -m pip install -r requirements.txt"]
