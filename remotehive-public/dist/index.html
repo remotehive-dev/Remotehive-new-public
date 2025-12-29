@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RemoteHive Public</title>
+    <script type="module" crossorigin src="/assets/index-DRvMIv0a.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/react-vendor-BxREvY7c.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-CAEYltxt.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Load Google Maps API explicitly to ensure availability -->
+    <script>
+      // Function to dynamically load the Google Maps script
+      function loadGoogleMaps() {
+        if (window.google && window.google.maps) return; // Already loaded
+        
+        // We use a small fetch to getting the env variable from Vite if possible, 
+        // but since this is index.html, we can't easily access import.meta.env.
+        // However, we can use the specific API key the user provided.
+        // In a real production build, this should be handled by a plugin or env substitution.
+        // For now, using the key from the context to ensure it works.
+        const apiKey = "AIzaSyBju2udK-7SUPNLfBosyK5ZOZIvhoPJ3tQ"; 
+        
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+      loadGoogleMaps();
+    </script>
+  </body>
+  </html>
+
