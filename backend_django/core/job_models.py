@@ -36,6 +36,9 @@ class Job(models.Model):
         choices=[('external', 'External URL'), ('internal', 'On RemoteHive')],
         default='external'
     )
+    
+    # Taxonomy Linking
+    job_role = models.ForeignKey('core.JobRole', on_delete=models.SET_NULL, null=True, blank=True, related_name='jobs')
 
     status = models.CharField(max_length=20, choices=JOB_STATUS_CHOICES, default='draft')
 

@@ -12,10 +12,16 @@ def scraper_stats_view(request):
     source_stats = []
     for source in sources:
         success, msg = "Unknown", "No test run"
-        if "RapidAPI" in source.name:
+        name_lower = source.name.lower()
+        
+        if "rapidapi" in name_lower and "linkedin" not in name_lower:
             success, msg = test_api_connection('rapidapi')
-        elif "SERP" in source.name:
+        elif "linkedin" in name_lower:
+            success, msg = test_api_connection('linkedin')
+        elif "serp" in name_lower or "google" in name_lower:
             success, msg = test_api_connection('serp')
+        elif "openweb" in name_lower or "ninja" in name_lower:
+            success, msg = test_api_connection('openwebninja')
             
         source_stats.append({
             'name': source.name,

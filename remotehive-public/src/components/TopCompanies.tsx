@@ -1,99 +1,83 @@
 import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-const COMPANIES = [
-  {
-    category: 'MNCs',
-    count: '2.2K+',
-    logos: [
-      'https://www.google.com/s2/favicons?domain=google.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=microsoft.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=amazon.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=ibm.com&sz=128',
-    ],
-    href: '/jobs?type=MNC',
-  },
-  {
-    category: 'Product',
-    count: '1.2K+',
-    logos: [
-      'https://www.google.com/s2/favicons?domain=stripe.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=airbnb.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=spotify.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=uber.com&sz=128',
-    ],
-    href: '/jobs?type=Product',
-  },
-  {
-    category: 'Banking & Finance',
-    count: '433',
-    logos: [
-      'https://www.google.com/s2/favicons?domain=jpmorgan.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=goldmansachs.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=citigroup.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=wellsfargo.com&sz=128',
-    ],
-    href: '/jobs?role=Banking',
-  },
-  {
-    category: 'Hospitality',
-    count: '104',
-    logos: [
-      'https://www.google.com/s2/favicons?domain=marriott.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=hilton.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=hyatt.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=airbnb.com&sz=128',
-    ],
-    href: '/jobs?role=Hospitality',
-  },
-  {
-    category: 'Fintech',
-    count: '135',
-    logos: [
-      'https://www.google.com/s2/favicons?domain=paypal.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=squareup.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=robinhood.com&sz=128',
-      'https://www.google.com/s2/favicons?domain=coinbase.com&sz=128',
-    ],
-    href: '/jobs?role=Fintech',
-  },
-];
+import { useEffect, useState } from 'react';
+import { getCompanies } from '../lib/api';
+import { Company } from '../types';
 
 export function TopCompanies() {
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCompanies() {
+      try {
+        const data = await getCompanies();
+        setCompanies(data || []);
+      } catch (err) {
+        console.error("Failed to load top companies", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchCompanies();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="mt-20">
+        <h2 className="text-center text-2xl font-bold text-slate-900">Top companies hiring now</h2>
+        <div className="mt-8 flex justify-center">
+            <div className="h-16 w-full max-w-4xl bg-slate-50 rounded-2xl animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
+  if (companies.length === 0) return null;
+
   return (
     <div className="mt-20">
-      <h2 className="text-center text-2xl font-bold text-slate-900">Top companies hiring now</h2>
+      <h2 className="text-center text-2xl font-bold text-slate-900 mb-8">Top companies hiring now</h2>
       
-      <div className="mt-8 flex gap-6 overflow-x-auto pb-6 scrollbar-hide">
-        {COMPANIES.map((item) => (
-          <Link
-            key={item.category}
-            to={item.href}
-            className="group relative flex min-w-[280px] flex-col rounded-2xl border border-slate-200 bg-white p-6 transition-all hover:border-indigo-300 hover:shadow-lg"
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="flex items-center gap-1 text-lg font-bold text-slate-900">
-                {item.category} <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-indigo-600" />
-              </h3>
-            </div>
-            <p className="mb-6 text-sm text-slate-500">{item.count} are actively hiring</p>
-            
-            <div className="flex gap-3">
-              {item.logos.map((logo, idx) => (
-                <div key={idx} className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-100 bg-white p-1 shadow-sm">
-                  <img 
-                    src={logo} 
-                    alt="Company logo" 
-                    className="h-full w-full object-contain" 
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${item.category.charAt(0)}&background=random`;
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-          </Link>
-        ))}
+      <div className="relative group/container">
+        {/* Scroll Shadows - fade effect on edges */}
+        <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+
+        <div className="overflow-x-auto pb-8 pt-4 px-4 flex gap-4 scrollbar-hide snap-x snap-mandatory">
+            {companies.map((company) => (
+                <Link
+                    key={company.id}
+                    to={`/jobs?company_name=${encodeURIComponent(company.name)}`}
+                    className="group flex-shrink-0 snap-start flex items-center gap-3 px-5 py-3 rounded-2xl border border-slate-200 bg-white transition-all duration-300 origin-bottom hover:scale-110 hover:border-indigo-300 hover:shadow-xl cursor-pointer"
+                >
+                    <div className="h-8 w-8 flex-shrink-0 rounded-lg bg-white p-1 border border-slate-100 flex items-center justify-center overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-300">
+                        {company.logo_url ? (
+                            <img 
+                                src={company.logo_url} 
+                                alt={company.name} 
+                                className="h-full w-full object-contain"
+                                onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    const span = e.currentTarget.parentElement?.querySelector('.fallback-text');
+                                    if (span) (span as HTMLElement).style.display = 'block';
+                                }}
+                            />
+                        ) : null}
+                        <span 
+                            className="fallback-text text-slate-400 font-bold text-xs absolute inset-0 flex items-center justify-center bg-slate-50"
+                            style={{ display: company.logo_url ? 'none' : 'flex' }}
+                        >
+                            {company.name.charAt(0)}
+                        </span>
+                    </div>
+                    
+                    <span className="text-base font-semibold whitespace-nowrap text-slate-600 group-hover:text-slate-900">
+                        {company.name}
+                    </span>
+                </Link>
+            ))}
+        </div>
       </div>
     </div>
   );

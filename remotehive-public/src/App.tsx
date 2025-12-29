@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { ClerkProvider, isAuthEnabled } from './components/AuthComponents';
 import OnboardingCheck from './components/OnboardingCheck';
+import { SEOHead } from './components/SEOHead';
 import { RootLayout } from './layouts/RootLayout';
 import { HomePage } from './pages/HomePage';
 import { JobsPage } from './pages/JobsPage';
@@ -31,6 +33,8 @@ import { OverviewPage } from './pages/dashboard/OverviewPage';
 import { ProfilePage } from './pages/dashboard/ProfilePage';
 import { ApplicationsPage } from './pages/dashboard/ApplicationsPage';
 import { SavedJobsPage } from './pages/dashboard/SavedJobsPage';
+import { JobFeedPage } from './pages/dashboard/JobFeedPage';
+import { CompaniesFeedPage } from './pages/dashboard/CompaniesFeedPage';
 import { SettingsPage } from './pages/dashboard/SettingsPage';
 
 // Placeholder key - user must replace this in .env
@@ -48,9 +52,11 @@ export default function App() {
           ⚠️ Authentication is disabled. Please add VITE_CLERK_PUBLISHABLE_KEY to your .env file.
         </div>
       )}
-      <BrowserRouter>
-        <OnboardingCheck>
-          <Routes>
+      <HelmetProvider>
+        <BrowserRouter>
+          <SEOHead />
+          <OnboardingCheck>
+            <Routes>
             <Route path="/onboarding" element={<OnboardingPage />} />
             
             {/* Public Routes */}
@@ -78,6 +84,8 @@ export default function App() {
               <Route path="resume-builder" element={<ResumeBuilder />} />
               <Route path="applications" element={<ApplicationsPage />} />
               <Route path="saved-jobs" element={<SavedJobsPage />} />
+              <Route path="apply-jobs" element={<JobFeedPage />} />
+              <Route path="companies" element={<CompaniesFeedPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
 
@@ -98,6 +106,7 @@ export default function App() {
           </Routes>
         </OnboardingCheck>
       </BrowserRouter>
+    </HelmetProvider>
     </ClerkProvider>
   );
 }

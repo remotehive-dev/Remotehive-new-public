@@ -42,7 +42,7 @@ class JobAdmin(admin.ModelAdmin):
         }),
     )
     
-    actions = ['publish_jobs', 'close_jobs']
+    actions = ['publish_jobs', 'close_jobs', 'sync_to_supabase_action']
 
     def posted_by_badge(self, obj):
         role = "User"
@@ -73,13 +73,29 @@ class JobAdmin(admin.ModelAdmin):
     quick_view_action.short_description = "Actions"
 
     def publish_jobs(self, request, queryset):
-        queryset.update(status='published')
-        self.message_user(request, "Selected jobs have been published.")
+        count = 0
+        for job in queryset:
+            job.status = 'published'
+            job.save() # Triggers post_save signal -> Sync to Supabase
+            count += 1
+        self.message_user(request, f"{count} jobs have been published and synced to Supabase.")
     publish_jobs.short_description = "Publish selected jobs"
 
     def close_jobs(self, request, queryset):
-        queryset.update(status='closed')
-        self.message_user(request, "Selected jobs have been closed.")
+        count = 0
+        for job in queryset:
+            job.status = 'closed'
+            job.save() # Triggers post_save signal
+            count += 1
+        self.message_user(request, f"{count} jobs have been closed.")
     close_jobs.short_description = "Close selected jobs"
+
+    def sync_to_supabase_action(self, request, queryset):
+        count = 0
+        for job in queryset:
+            job.save() # Triggers post_save signal
+            count += 1
+        self.message_user(request, f"Triggered sync for {count} jobs.")
+    sync_to_supabase_action.short_description = "Sync selected jobs to Supabase"
 
 admin.site.register(Job, JobAdmin)

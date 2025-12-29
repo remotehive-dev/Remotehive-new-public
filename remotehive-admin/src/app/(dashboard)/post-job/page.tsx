@@ -5,10 +5,10 @@ import { ArrowLeft, Plus, MapPin, Building2, Globe, Loader2, Wand2, Check, Save 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import { createJob, getUserByClerkId } from "../../../lib/api";
+import { createJob, getUserByClerkId, getJobRoles } from "../../../lib/api";
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { clsx } from "clsx";
@@ -106,6 +106,70 @@ const AIRewriteButton = ({ onRewrite, isLoading }: { onRewrite: () => void, isLo
   </button>
 );
 
+const JobTitleAutocomplete = ({ value, onChange }: { value: string, onChange: (val: string) => void }) => {
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+        if (value && value.length >= 2) {
+            setIsLoading(true);
+            try {
+                const roles = await getJobRoles(value);
+                setSuggestions(roles || []);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setIsLoading(false);
+            }
+        } else {
+            setSuggestions([]);
+        }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [value]);
+
+  return (
+    <div className="relative">
+      <input
+        value={value || ''}
+        onChange={(e) => {
+            onChange(e.target.value);
+            setShowSuggestions(true);
+        }}
+        onFocus={() => setShowSuggestions(true)}
+        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+        className="block w-full rounded-lg border border-slate-300 px-4 py-2.5 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-all"
+        placeholder="e.g. Senior Frontend Engineer"
+      />
+      {isLoading && showSuggestions && (
+          <div className="absolute right-3 top-3">
+              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+          </div>
+      )}
+      {showSuggestions && suggestions.length > 0 && (
+        <ul className="absolute z-10 mt-1 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm max-h-60">
+          {suggestions.map((role) => (
+            <li
+              key={role.slug}
+              className="cursor-pointer select-none py-2.5 pl-3 pr-9 hover:bg-indigo-50 text-slate-900"
+              onClick={() => {
+                  onChange(role.name);
+                  setShowSuggestions(false);
+              }}
+            >
+              {role.name}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
 export default function PostJobPage() {
   const router = useRouter();
   const { user } = useUser();
@@ -132,7 +196,7 @@ export default function PostJobPage() {
     libraries,
   });
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch, getValues } = useForm<JobFormData>({
+  const { register, handleSubmit, formState: { errors }, setValue, watch, getValues, control } = useForm<JobFormData>({
     resolver: zodResolver(jobSchema),
     defaultValues: {
       type: 'full-time',
@@ -293,15 +357,20 @@ export default function PostJobPage() {
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Job Title <span className="text-red-500">*</span></label>
-                <input
-                  {...register('title')}
-                  className="block w-full rounded-lg border border-slate-300 px-4 py-2.5 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-all"
-                  placeholder="e.g. Senior Frontend Engineer"
+                <Controller
+                  name="title"
+                  control={control}
+                  render={({ field }) => (
+                    <JobTitleAutocomplete
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
                 />
                 {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>}
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Employment Type</label>
                   <select

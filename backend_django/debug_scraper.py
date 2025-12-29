@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'remotehive_admin.settings')
 django.setup()
 
-from autoscraper.services import fetch_rapid_jobs, fetch_serp_jobs
+from autoscraper.services import fetch_rapid_jobs, fetch_serp_jobs, fetch_adzuna_jobs
 from core.models import APIConfiguration
 
 def run():
@@ -39,6 +39,14 @@ def run():
         print(f"SERP API Error: {error}")
     else:
         print(f"SERP API Success: Fetched {count} jobs.")
+
+    # Run Adzuna API
+    print("\nAttempting Adzuna API fetch...")
+    count, error = fetch_adzuna_jobs()
+    if error:
+        print(f"Adzuna API Error: {error}")
+    else:
+        print(f"Adzuna API Success: Fetched {count} jobs.")
 
     print("\n--- Done ---")
 

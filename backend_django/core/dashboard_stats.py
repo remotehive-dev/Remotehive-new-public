@@ -21,6 +21,8 @@ def get_dashboard_stats():
         # Scraped Jobs
         "jobs_scraped_total": 0,
         "jobs_scraped_new": 0,
+        "jobs_scraped_approved": 0,
+        "jobs_scraped_rejected": 0,
         
         # Other
         "leads_count": 0,
@@ -44,6 +46,8 @@ def get_dashboard_stats():
     try:
         stats['jobs_scraped_total'] = ScrapedJob.objects.count()
         stats['jobs_scraped_new'] = ScrapedJob.objects.filter(status='new').count()
+        stats['jobs_scraped_approved'] = ScrapedJob.objects.filter(status='approved').count()
+        stats['jobs_scraped_rejected'] = ScrapedJob.objects.filter(status='rejected').count()
     except Exception as e:
         print(f"Scraped Job Stats Error: {e}")
 

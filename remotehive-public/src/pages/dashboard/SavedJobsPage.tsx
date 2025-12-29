@@ -1,8 +1,22 @@
+import { Link } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
+
 export function SavedJobsPage() {
   return (
     <div className="max-w-6xl mx-auto py-6">
-      <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Saved Jobs</h1>
-      <p className="mt-1 text-sm text-gray-500">Jobs you've bookmarked for later.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Saved Jobs</h1>
+          <p className="mt-1 text-sm text-gray-500">Jobs you've bookmarked for later.</p>
+        </div>
+        <Link 
+          to="/dashboard/apply-jobs" 
+          className="inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition-colors shadow-sm"
+        >
+          <Sparkles className="h-4 w-4" />
+          Apply New Jobs
+        </Link>
+      </div>
 
       <div className="mt-8 neu-card">
         {/* Empty State */}
@@ -15,9 +29,9 @@ export function SavedJobsPage() {
           <h3 className="mt-4 text-lg font-bold text-gray-800">No saved jobs</h3>
           <p className="mt-2 text-sm text-gray-500">Bookmark jobs to view them here later.</p>
           <div className="mt-8">
-            <a href="/jobs" className="neu-btn-primary inline-flex items-center">
+            <Link to="/dashboard/apply-jobs" className="neu-btn-primary inline-flex items-center">
               Browse Jobs
-            </a>
+            </Link>
           </div>
         </div>
       </div>

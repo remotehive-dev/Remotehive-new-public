@@ -19,6 +19,7 @@ export interface Job {
   benefits?: string[];
   job_reference_id?: string;
   application_method?: 'external' | 'internal';
+  company?: Company;
 }
 
 export interface Company {
@@ -34,4 +35,5 @@ export interface Company {
   size?: string;
   founded?: string;
   industry?: string;
+  type?: string;
 }

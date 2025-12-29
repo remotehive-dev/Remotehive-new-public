@@ -6,6 +6,7 @@ import { Job } from '../types';
 import { getJob, getUserByClerkId } from '../lib/api';
 import { getMissingMandatoryFields } from '../lib/profileScore';
 import sanitizeHtml from 'sanitize-html';
+import { CompanyDrawer } from '../components/CompanyDrawer';
 
 export function JobDetailPage() {
   const { id } = useParams();
@@ -20,6 +21,7 @@ export function JobDetailPage() {
   const [isApplying, setIsApplying] = useState(false);
   const [missingFields, setMissingFields] = useState<string[]>([]);
   const [showMissingFieldsModal, setShowMissingFieldsModal] = useState(false);
+  const [showCompanyDrawer, setShowCompanyDrawer] = useState(false);
 
   useEffect(() => {
     async function fetchJob() {
@@ -319,14 +321,14 @@ export function JobDetailPage() {
                 </div>
                 <div>
                   <div className="font-bold text-slate-900">{job.company_name}</div>
-                  <a href="#" className="text-sm text-indigo-600 hover:underline">View Profile</a>
+                  <button onClick={() => setShowCompanyDrawer(true)} className="text-sm text-indigo-600 hover:underline">View Profile</button>
                 </div>
               </div>
               
               <div className="mt-6 space-y-4">
                 <div className="flex items-start gap-3 text-sm text-slate-600">
                   <Globe className="mt-0.5 h-4 w-4 text-slate-400" />
-                  <span>Website: <a href="#" className="text-indigo-600 hover:underline">Visit Site</a></span>
+                  <span>Website: <a href={job.company?.website_url || '#'} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Visit Site</a></span>
                 </div>
                 <div className="flex items-start gap-3 text-sm text-slate-600">
                   <MapPin className="mt-0.5 h-4 w-4 text-slate-400" />
@@ -341,6 +343,15 @@ export function JobDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Company Drawer */}
+      {job.company && (
+        <CompanyDrawer
+          company={job.company}
+          isOpen={showCompanyDrawer}
+          onClose={() => setShowCompanyDrawer(false)}
+        />
+      )}
     </div>
   );
 }

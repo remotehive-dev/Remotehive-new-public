@@ -1,25 +1,35 @@
 import { useUser } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
 import { getUserByClerkId } from "../../lib/api";
+import { getSavedJobsCount, getApplicationsCount } from "../../lib/api_stats";
 
 export function OverviewPage() {
   const { user } = useUser();
   const [profile, setProfile] = useState<any>(null);
+  const [savedCount, setSavedCount] = useState(0);
+  const [applicationsCount, setApplicationsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function loadProfile() {
+    async function loadData() {
       if (!user) return;
       try {
-        const data = await getUserByClerkId(user.id);
-        setProfile(data);
+        const [profileData, saved, applications] = await Promise.all([
+          getUserByClerkId(user.id),
+          getSavedJobsCount(user.id),
+          getApplicationsCount(user.id)
+        ]);
+        
+        setProfile(profileData);
+        setSavedCount(saved);
+        setApplicationsCount(applications);
       } catch (error) {
-        console.error("Error loading profile:", error);
+        console.error("Error loading dashboard data:", error);
       } finally {
         setIsLoading(false);
       }
     }
-    loadProfile();
+    loadData();
   }, [user]);
 
   if (isLoading) {

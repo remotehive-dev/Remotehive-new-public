@@ -2,7 +2,7 @@ import { Search, MapPin, Briefcase } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const ROLES = [
+const DEFAULT_ROLES = [
   "Engineering",
   "Design",
   "Product",
@@ -14,7 +14,7 @@ const ROLES = [
   "HR",
 ];
 
-const LOCATIONS = [
+const DEFAULT_LOCATIONS = [
   "Worldwide",
   "North America",
   "Europe",
@@ -24,11 +24,34 @@ const LOCATIONS = [
   "Australia / NZ",
 ];
 
-export function JobSearch() {
+interface Option {
+  label: string;
+  value: string;
+}
+
+interface JobSearchProps {
+  placeholder?: string;
+  roles?: Option[];
+  locations?: Option[];
+}
+
+export function JobSearch({ 
+  placeholder = "Job title or keyword",
+  roles,
+  locations
+}: JobSearchProps) {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
   const [role, setRole] = useState("");
   const [location, setLocation] = useState("");
+
+  const roleOptions = roles && roles.length > 0 
+    ? roles 
+    : DEFAULT_ROLES.map(r => ({ label: r, value: r }));
+
+  const locationOptions = locations && locations.length > 0
+    ? locations
+    : DEFAULT_LOCATIONS.map(l => ({ label: l, value: l }));
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +76,7 @@ export function JobSearch() {
           </div>
           <input
             type="text"
-            placeholder="Job title or keyword"
+            placeholder={placeholder}
             className="block w-full rounded-xl border-0 bg-slate-50 py-3 pl-10 pr-3 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
@@ -71,8 +94,8 @@ export function JobSearch() {
             onChange={(e) => setRole(e.target.value)}
           >
             <option value="">Any Role</option>
-            {ROLES.map((r) => (
-              <option key={r} value={r}>{r}</option>
+            {roleOptions.map((r) => (
+              <option key={r.value} value={r.value}>{r.label}</option>
             ))}
           </select>
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -93,8 +116,8 @@ export function JobSearch() {
             onChange={(e) => setLocation(e.target.value)}
           >
             <option value="">Any Location</option>
-            {LOCATIONS.map((l) => (
-              <option key={l} value={l}>{l}</option>
+            {locationOptions.map((l) => (
+              <option key={l.value} value={l.value}>{l.label}</option>
             ))}
           </select>
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">

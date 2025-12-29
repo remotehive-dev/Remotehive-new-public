@@ -38,6 +38,98 @@ export interface CompanyProfile {
   };
 }
 
+export interface DashboardStats {
+  stats: {
+    name: string;
+    value: string;
+    change: string;
+    changeType: 'positive' | 'negative' | 'neutral';
+    icon: string;
+  }[];
+  recentJobs: {
+    id: string; // Add ID to recentJobs
+    title: string;
+    type: string;
+    posted: string;
+    applicants: number;
+    status: string;
+    location: string;
+    salary: string;
+  }[];
+}
+
+export async function getDashboardStats(companyId: string): Promise<DashboardStats> {
+  const supabase = getSupabase();
+
+  // Note: views_count and applications_count are currently not in Supabase schema
+  const { data, error } = await supabase
+    .from('jobs')
+    .select('id, status, title, posted_at, type, location, salary_range') 
+    .eq('company_id', companyId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const jobs = data as any[];
+
+  const activeJobs = jobs.filter((job: any) => job.status === 'active' || job.status === 'published').length;
+  // Default to 0 as columns are missing
+  const totalApplicants = 0; // jobs.reduce((sum, job) => sum + (job.applications_count || 0), 0);
+  const jobViews = 0; // jobs.reduce((sum, job) => sum + (job.views_count || 0), 0);
+  
+  // Avg Conversion (avoid division by zero)
+  const avgConversion = '0%';
+
+  // Recent jobs (take top 5 sorted by posted_at)
+  const recentJobs = [...jobs]
+    .sort((a: any, b: any) => new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime())
+    .slice(0, 5)
+    .map((job: any) => ({
+      id: job.id, // Map ID
+      title: job.title,
+      type: job.type || 'Full-time', // Default if missing
+      posted: new Date(job.posted_at).toLocaleDateString(),
+      applicants: 0, // job.applications_count || 0,
+      status: job.status,
+      location: job.location,
+      salary: job.salary_range
+    }));
+
+  return {
+    stats: [
+      { name: "Active Jobs", value: activeJobs.toString(), change: "0", changeType: "neutral", icon: "Briefcase" },
+      { name: "Total Applicants", value: totalApplicants.toString(), change: "0", changeType: "neutral", icon: "Users" },
+      { name: "Job Views", value: jobViews.toString(), change: "0", changeType: "neutral", icon: "Eye" },
+      { name: "Avg. Conversion", value: avgConversion, change: "0", changeType: "neutral", icon: "TrendingUp" },
+    ],
+    recentJobs
+  };
+}
+
+export async function getJobRoles(search?: string) {
+  const supabase = getSupabase();
+  
+  // Try to fetch from 'job_roles' table
+  let query = supabase
+    .from('job_roles')
+    .select('name, slug')
+    .order('name');
+
+  if (search) {
+    query = query.ilike('name', `%${search}%`).limit(10);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.warn("Failed to fetch job roles (table might be missing):", error.message);
+    return [];
+  }
+
+  return data;
+}
+
 export async function createJob(job: JobPost) {
   const supabase = getSupabase();
   

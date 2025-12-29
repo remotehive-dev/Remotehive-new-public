@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { 
-  LayoutDashboard, 
-  UserCircle, 
-  Briefcase, 
   BookmarkCheck, 
-  Settings, 
+  Briefcase, 
+  FileText, 
+  LayoutDashboard, 
+  LogOut, 
   Menu, 
-  X,
-  LogOut,
-  FileText
+  Settings, 
+  Sparkles, 
+  UserCircle, 
+  Building2,
+  X
 } from 'lucide-react';
 import { UserButton, useClerk, useUser } from '@clerk/clerk-react';
 import { clsx } from 'clsx';
@@ -26,6 +28,8 @@ export function DashboardLayout() {
     { name: 'Build Resume', href: '/dashboard/resume-builder', icon: FileText },
     { name: 'My Applications', href: '/dashboard/applications', icon: Briefcase },
     { name: 'Saved Jobs', href: '/dashboard/saved-jobs', icon: BookmarkCheck },
+    { name: 'Apply New Jobs', href: '/dashboard/apply-jobs', icon: Sparkles },
+    { name: 'Companies', href: '/dashboard/companies', icon: Building2 },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
 

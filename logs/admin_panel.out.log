@@ -7,3 +7,92 @@
   - Environments: .env
 
  ✓ Starting...
+ ✓ Ready in 1366ms
+ ✓ Compiled /src/middleware in 299ms (188 modules)
+ ○ Compiling /sign-in/[[...sign-in]] ...
+ ✓ Compiled /sign-in/[[...sign-in]] in 3.5s (843 modules)
+ GET /sign-in?redirect_url=http%3A%2F%2Flocalhost%3A3000%2F 200 in 4251ms
+ POST /sign-in?redirect_url=http%3A%2F%2Flocalhost%3A3000%2F 200 in 47ms
+ POST /sign-in?redirect_url=http%3A%2F%2Flocalhost%3A3000%2F 200 in 18ms
+ GET /sign-in/SignIn_clerk_catchall_check_1766991521924 200 in 85ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.7s (1170 modules)
+ GET / 200 in 3037ms
+ POST / 200 in 20ms
+ POST / 200 in 14ms
+ ✓ Compiled /jobs in 404ms (1172 modules)
+ GET /jobs 200 in 735ms
+ POST /jobs 200 in 11ms
+ POST /jobs 200 in 10ms
+ ○ Compiling /post-job ...
+ ✓ Compiled /post-job in 2.5s (1350 modules)
+ ✓ Compiled in 1629ms (1274 modules)
+ ✓ Compiled in 1321ms (1274 modules)
+ GET / 200 in 131ms
+ POST / 200 in 17ms
+ POST / 200 in 12ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1030ms (1263 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1509ms
+ ✓ Compiled in 731ms (1274 modules)
+ ✓ Compiled in 659ms (1274 modules)
+ GET / 200 in 151ms
+ ✓ Compiled /_not-found in 386ms (1263 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 540ms
+ POST / 200 in 17ms
+ POST / 200 in 9ms
+ ○ Compiling /post-job ...
+ ✓ Compiled /post-job in 554ms (771 modules)
+ ✓ Compiled in 2.9s (1364 modules)
+ ✓ Compiled in 1311ms (1364 modules)
+ ✓ Compiled in 481ms (1364 modules)
+ ✓ Compiled in 384ms (1364 modules)
+ ✓ Compiled in 487ms (1364 modules)
+ GET /post-job 200 in 181ms
+ POST /post-job 200 in 13ms
+ POST /post-job 200 in 8ms
+ GET /sign-in?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fpost-job 200 in 33ms
+ POST /sign-in?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fpost-job 200 in 11ms
+ POST /sign-in?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fpost-job 200 in 10ms
+ GET /sign-in/SignIn_clerk_catchall_check_1766992447664 200 in 29ms
+ GET /sign-in?redirect_url=http%3A%2F%2Flocalhost%3A3000%2F 200 in 41ms
+ POST /sign-in?redirect_url=http%3A%2F%2Flocalhost%3A3000%2F 200 in 10ms
+ POST /sign-in?redirect_url=http%3A%2F%2Flocalhost%3A3000%2F 200 in 12ms
+ GET /sign-in/SignIn_clerk_catchall_check_1766992471348 200 in 36ms
+ GET / 200 in 88ms
+ POST / 200 in 8ms
+ POST / 200 in 7ms
+ GET /post-job 200 in 66ms
+ POST /post-job 200 in 11ms
+ POST /post-job 200 in 8ms
+ ✓ Compiled in 1597ms (1364 modules)
+ ✓ Compiled in 1387ms (1364 modules)
+ GET /post-job 200 in 892ms
+ POST /post-job 200 in 23ms
+ POST /post-job 200 in 12ms
+ ✓ Compiled in 546ms (1364 modules)
+ GET /post-job 200 in 303ms
+ POST /post-job 200 in 25ms
+ POST /post-job 200 in 24ms
+ GET /post-job 200 in 26ms
+ POST /post-job 200 in 10ms
+ POST /post-job 200 in 9ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1246ms (1353 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1514ms
+ GET /post-job 200 in 132ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 66ms
+ POST /post-job 200 in 15ms
+ POST /post-job 200 in 13ms
+ GET /post-job 200 in 30ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 27ms
+ POST /post-job 200 in 16ms
+ POST /post-job 200 in 11ms
+ GET /sign-in?redirect_url=http%3A%2F%2Flocalhost%3A3000%2F 200 in 35ms
+ POST /sign-in?redirect_url=http%3A%2F%2Flocalhost%3A3000%2F 200 in 9ms
+ POST /sign-in?redirect_url=http%3A%2F%2Flocalhost%3A3000%2F 200 in 10ms
+ GET /sign-in/SignIn_clerk_catchall_check_1766993055369 200 in 34ms
+ GET / 200 in 32ms
+ POST / 200 in 10ms
+ POST / 200 in 8ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 24ms

@@ -3,11 +3,68 @@ import { storage, APPWRITE_BUCKET_ID, ID } from "./appwrite";
 import { Job } from "../types";
 
 export const BASE_URL = "http://localhost:8000";
+export const DJANGO_API_URL = "http://localhost:8001";
 
 export async function getHealth(): Promise<{ status: string }> {
   const res = await fetch(`${BASE_URL}/health`);
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return res.json();
+}
+
+export interface SEOConfig {
+  global_tags: Array<{ name: string; content: string; location: string }>;
+  pages: Record<string, {
+    title: string;
+    description: string;
+    keywords?: string;
+    og_image?: string;
+    canonical_url?: string;
+    no_index?: boolean;
+  }>;
+  marketing: Array<{
+    name: string;
+    provider: string;
+    pixel_id?: string;
+    script_content?: string;
+  }>;
+}
+
+export async function fetchSEOConfig(): Promise<SEOConfig | null> {
+  try {
+    const res = await fetch(`${DJANGO_API_URL}/api/seo-config/`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch SEO config:", error);
+    return null;
+  }
+}
+
+export interface CompanyCategory {
+  id: number;
+  name: string;
+  slug: string;
+  icon?: string;
+  description?: string;
+  count: number;
+  sample_logos: string[];
+  subcategories: Array<{
+    id: number;
+    name: string;
+    slug: string;
+    count: number;
+  }>;
+}
+
+export async function getCompanyCategories(): Promise<CompanyCategory[]> {
+  try {
+    const res = await fetch(`${DJANGO_API_URL}/api/company-categories/`);
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch company categories:", error);
+    return [];
+  }
 }
 
 export async function getJobs(filters?: {
@@ -16,6 +73,10 @@ export async function getJobs(filters?: {
   location?: string;
   type?: string;
   companyId?: string;
+  company_name?: string;
+  tenure?: string;
+  salary_min?: number;
+  date_posted?: '24h' | '7d' | '30d' | 'all';
 }): Promise<Job[]> {
   const supabase = getSupabase();
   let query = supabase
@@ -28,16 +89,14 @@ export async function getJobs(filters?: {
       salary_range,
       posted_at,
       tags,
+      description,
       application_url,
-      company:companies(name, logo_url)
+      company:companies(id, name, logo_url, website_url, description)
     `)
-    .eq('status', 'active')
+    .in('status', ['active', 'approved', 'published'])
     .order('posted_at', { ascending: false });
 
   if (filters?.keyword) {
-    // Search in title or company name
-    // Note: Supabase doesn't support OR across joined tables easily in one filter string
-    // We'll search title for now, or improve with a function later
     query = query.ilike('title', `%${filters.keyword}%`);
   }
 
@@ -52,10 +111,26 @@ export async function getJobs(filters?: {
   if (filters?.companyId) {
     query = query.eq('company_id', filters.companyId);
   }
-  
-  // Role filtering is tricky with tags array, simplified for now
+
+  // Role filtering 
   if (filters?.role) {
-    query = query.contains('tags', [filters.role]);
+    // Check if role is in tags OR title matches
+    query = query.or(`title.ilike.%${filters.role}%,tags.cs.{${filters.role}}`);
+  }
+
+  if (filters?.date_posted && filters.date_posted !== 'all') {
+    const now = new Date();
+    let pastDate = new Date();
+    
+    if (filters.date_posted === '24h') {
+      pastDate.setDate(now.getDate() - 1);
+    } else if (filters.date_posted === '7d') {
+      pastDate.setDate(now.getDate() - 7);
+    } else if (filters.date_posted === '30d') {
+      pastDate.setDate(now.getDate() - 30);
+    }
+    
+    query = query.gte('posted_at', pastDate.toISOString());
   }
 
   const { data, error } = await query;
@@ -66,18 +141,66 @@ export async function getJobs(filters?: {
   }
 
   // Map database response to Job interface
-  return data.map((job: any) => ({
+  let jobs = data.map((job: any) => ({
     id: job.id,
     title: job.title,
     company_name: job.company?.name || 'Unknown Company',
     company_logo_url: job.company?.logo_url,
+    company: job.company, // Pass full company object
     location: job.location,
     type: job.type,
     salary_range: job.salary_range,
     posted_at: job.posted_at,
     tags: job.tags || [],
+    description: job.description,
     application_url: job.application_url
-  }));
+  })) as Job[];
+
+  // Client-side filtering for complex fields
+
+  // 1. Company Name Filter
+  if (filters?.company_name) {
+    jobs = jobs.filter(job =>
+      job.company_name.toLowerCase().includes(filters.company_name!.toLowerCase())
+    );
+  }
+
+  // 2. Tenure Filter (Approximation)
+  if (filters?.tenure) {
+    const tenure = filters.tenure.toLowerCase();
+    jobs = jobs.filter(job => {
+      const text = (job.title + ' ' + (job.tags || []).join(' ')).toLowerCase();
+      if (tenure === 'entry' || tenure === 'junior') return text.includes('junior') || text.includes('entry') || text.includes('intern') || text.includes('associate');
+      if (tenure === 'senior') return text.includes('senior') || text.includes('lead') || text.includes('principal') || text.includes('staff');
+      if (tenure === 'manager') return text.includes('manager') || text.includes('head') || text.includes('director') || text.includes('vp');
+      if (tenure === 'mid') return !text.includes('senior') && !text.includes('lead') && !text.includes('junior') && !text.includes('intern') && !text.includes('manager');
+      return true;
+    });
+  }
+
+  // 3. Salary Filter (Basic Parsing)
+  if (filters?.salary_min) {
+    jobs = jobs.filter(job => {
+      if (!job.salary_range) return false;
+      // Extract number from string like "$100k - $120k"
+      const matches = job.salary_range.match(/(\d+)/);
+      if (!matches) return false;
+
+      let amount = parseInt(matches[0]);
+      // Heuristic: if number is small (e.g. 100), assume 'k'
+      if (amount < 1000 && job.salary_range.toLowerCase().includes('k')) {
+        amount *= 1000;
+      } else if (amount < 1000) {
+        // If just "50-60", likely "k" is implied in context or it is hourly? 
+        // Safest to assume annual 'k' for most checks if < 500
+        amount *= 1000;
+      }
+
+      return amount >= filters.salary_min!;
+    });
+  }
+
+  return jobs;
 }
 
 export async function getJob(id: string): Promise<Job | null> {
@@ -100,7 +223,7 @@ export async function getJob(id: string): Promise<Job | null> {
       description,
       requirements,
       benefits,
-      company:companies(name, logo_url, website_url, description)
+      company:companies(id, name, logo_url, website_url, description)
     `)
     .eq('id', id)
     .single();
@@ -118,6 +241,7 @@ export async function getJob(id: string): Promise<Job | null> {
     title: jobData.title,
     company_name: jobData.company?.name || 'Unknown Company',
     company_logo_url: jobData.company?.logo_url,
+    company: jobData.company, // Pass the full company object
     location: jobData.location,
     type: jobData.type,
     salary_range: jobData.salary_range,
@@ -201,7 +325,7 @@ export async function uploadResume(userId: string, file: File, token?: string, p
     const { data } = supabase.storage
       .from('Jobseeker-Resume')
       .getPublicUrl(filePath);
-    
+
     publicUrl = data.publicUrl;
   }
 
@@ -244,7 +368,7 @@ export interface UserProfile {
   country?: string;
   latitude?: number;
   longitude?: number;
-  
+
   work_experience?: any[];
   education?: any[];
   projects?: any[];
@@ -254,7 +378,7 @@ export interface UserProfile {
 
 export async function createUser(userData: UserProfile, token?: string) {
   const supabase = getSupabase(token);
-  
+
   const { data, error } = await supabase
     .from('users')
     .insert([userData] as any)
@@ -326,7 +450,7 @@ export async function getCandidates(filters?: {
 
 export async function updateUser(clerkId: string, updates: Partial<UserProfile>, token?: string) {
   const supabase = getSupabase(token);
-  
+
   const { data, error } = await supabase
     .from('users')
     .update(updates as any)
@@ -343,7 +467,7 @@ export async function updateUser(clerkId: string, updates: Partial<UserProfile>,
 
 export async function getUserByClerkId(clerkId: string, token?: string) {
   const supabase = getSupabase(token);
-  
+
   const { data, error } = await supabase
     .from('users')
     .select('*')

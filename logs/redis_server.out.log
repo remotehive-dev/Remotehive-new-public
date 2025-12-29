@@ -1,8 +1,8 @@
-69383:C 26 Dec 2025 18:34:47.407 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
-69383:C 26 Dec 2025 18:34:47.407 * Redis version=8.2.1, bits=64, commit=00000000, modified=1, pid=69383, just started
-69383:C 26 Dec 2025 18:34:47.407 * Configuration loaded
-69383:M 26 Dec 2025 18:34:47.408 * monotonic clock: POSIX clock_gettime
-69383:M 26 Dec 2025 18:34:47.410 * Running mode=standalone, port=6379.
-69383:M 26 Dec 2025 18:34:47.410 # WARNING: The TCP backlog setting of 511 cannot be enforced because kern.ipc.somaxconn is set to the lower value of 128.
-69383:M 26 Dec 2025 18:34:47.411 # Warning: Could not create server TCP listening socket *:6379: bind: Address already in use
-69383:M 26 Dec 2025 18:34:47.411 # Failed listening on port 6379 (tcp), aborting.
+95286:C 28 Dec 2025 21:30:19.750 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+95286:C 28 Dec 2025 21:30:19.750 * Redis version=8.2.1, bits=64, commit=00000000, modified=1, pid=95286, just started
+95286:C 28 Dec 2025 21:30:19.750 * Configuration loaded
+95286:M 28 Dec 2025 21:30:19.750 * monotonic clock: POSIX clock_gettime
+95286:M 28 Dec 2025 21:30:19.750 * Running mode=standalone, port=6379.
+95286:M 28 Dec 2025 21:30:19.750 # WARNING: The TCP backlog setting of 511 cannot be enforced because kern.ipc.somaxconn is set to the lower value of 128.
+95286:M 28 Dec 2025 21:30:19.750 # Warning: Could not create server TCP listening socket *:6379: bind: Address already in use
+95286:M 28 Dec 2025 21:30:19.750 # Failed listening on port 6379 (tcp), aborting.

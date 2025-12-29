@@ -18,11 +18,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.views.generic.base import RedirectView
-from core.views import api_docs_view, proxy_openapi
+from core.views import api_docs_view, proxy_openapi, dashboard_stats_api, home_page_config_api, create_support_ticket, taxonomy_api, seo_config_api, company_categories_api
 
 urlpatterns = [
     path("", RedirectView.as_view(url="admin/", permanent=False)),
     path("admin/api/docs/", api_docs_view, name="api_docs"),
     path("admin/api/schema/", proxy_openapi, name="api_schema_proxy"),
+    path("admin/api/dashboard-stats/", dashboard_stats_api, name="dashboard_stats_api"),
+    path("api/home-config/", home_page_config_api, name="home_page_config_api"),
+    path("api/seo-config/", seo_config_api, name="seo_config_api"),
+    path("api/company-categories/", company_categories_api, name="company_categories_api"),
+    path("api/support-ticket/", create_support_ticket, name="create_support_ticket"),
+    path("api/taxonomy/", taxonomy_api, name="taxonomy_api"),
     path("admin/", admin.site.urls),
 ]
