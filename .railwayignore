@@ -1,0 +1,42 @@
+# Node & Dependencies
+node_modules/
+**/node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build & Dist
+dist/
+**/dist/
+build/
+**/build/
+.next/
+**/.next/
+
+# Git
+.git/
+**/.git/
+
+# Temporary & Logs
+temp_reactive_resume/
+logs/
+dump.rdb
+.DS_Store
+.trae/
+
+# Environment
+.env
+.env.*
+venv/
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Monorepo: Exclude other services not needed for FastAPI backend
+backend_django/
+open-resume/
+remotehive-admin/
+remotehive-public/
