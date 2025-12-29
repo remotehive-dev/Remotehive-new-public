@@ -59,11 +59,7 @@ dump.rdb
 .kiro/steering/byterover-rules.md
 .qoder/rules/byterover-rules.md
 .augment/rules/byterover-rules.md
-<<<<<<< HEAD
 .trae/
 
 # Temp
 temp_reactive_resume/
-=======
-node_modules
->>>>>>> 1437c80 (feat: Introduce resume builder, user dashboard, AI features, and administrative tools with supporting infrastructure.)
