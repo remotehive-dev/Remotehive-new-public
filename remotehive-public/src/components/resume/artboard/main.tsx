@@ -4,7 +4,7 @@ import { RouterProvider } from "react-router";
 
 import { router } from "./router";
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+ 
 const root = ReactDOM.createRoot(document.querySelector("#root")!);
 
 root.render(

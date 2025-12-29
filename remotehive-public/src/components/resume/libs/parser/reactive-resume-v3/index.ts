@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+ 
 import { createId } from "@paralleldrive/cuid2";
 import {
   defaultAward,

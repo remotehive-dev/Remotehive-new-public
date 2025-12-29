@@ -28,7 +28,7 @@ export const Providers = () => {
     if (resumeData) setResume(JSON.parse(resumeData));
   }, [window.localStorage.getItem("resume")]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+   
   if (!resume) return null;
 
   return (

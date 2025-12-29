@@ -62,7 +62,7 @@ export const CustomSectionDialog = () => {
     setDraggedIndex(null);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+   
   if (!payload) return null;
 
   return (

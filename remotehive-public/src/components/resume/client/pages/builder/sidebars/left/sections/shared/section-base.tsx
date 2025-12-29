@@ -61,7 +61,7 @@ export const SectionBase = <T extends SectionItem>({ id, title, description }: P
     }),
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+   
   if (!section) return null;
 
   const onDragEnd = (event: DragEndEvent) => {

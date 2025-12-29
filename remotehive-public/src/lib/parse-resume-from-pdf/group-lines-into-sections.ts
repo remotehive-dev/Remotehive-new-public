@@ -21,7 +21,7 @@ export const PROFILE_SECTION: ResumeKey = "profile";
  * into the closest section title above these lines.
  */
 export const groupLinesIntoSections = (lines: Lines) => {
-  let sections: ResumeSectionToLines = {};
+  const sections: ResumeSectionToLines = {};
   let sectionName: string = PROFILE_SECTION;
   let sectionLines = [];
   for (let i = 0; i < lines.length; i++) {

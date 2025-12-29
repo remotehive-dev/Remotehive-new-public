@@ -10,7 +10,7 @@ export const groupTextItemsIntoLines = (textItems: TextItems): Lines => {
 
   // Group text items into lines based on hasEOL
   let line: Line = [];
-  for (let item of textItems) {
+  for (const item of textItems) {
     // If item is EOL, add current line to lines and start a new empty line
     if (item.hasEOL) {
       if (item.text.trim() !== "") {
@@ -34,7 +34,7 @@ export const groupTextItemsIntoLines = (textItems: TextItems): Lines => {
   // ones. This step is to merge adjacent text items if their distance is smaller
   // than a typical char width to filter out those noises.
   const typicalCharWidth = getTypicalCharWidth(lines.flat());
-  for (let line of lines) {
+  for (const line of lines) {
     // Start from the end of the line to make things easier to merge and delete
     for (let i = line.length - 1; i > 0; i--) {
       const currentItem = line[i];
@@ -90,7 +90,7 @@ const getTypicalCharWidth = (textItems: TextItems): number => {
   let commonFontName = "";
   let fontNameMaxCount = 0;
 
-  for (let item of textItems) {
+  for (const item of textItems) {
     const { text, height, fontName } = item;
     // Process height
     if (!heightToCount[height]) {

@@ -33,7 +33,7 @@ export function CompaniesPage() {
       try {
         const apiData = await getCompanies().catch(() => []) as Company[];
 
-        let csvCompanies: Company[] = [];
+        const csvCompanies: Company[] = [];
         try {
           const csvResponse = await fetch('/companies.csv');
           if (csvResponse.ok) {
@@ -46,7 +46,7 @@ export function CompaniesPage() {
               const parts: string[] = [];
               let current = '';
               let inQuotes = false;
-              for (let char of line) {
+              for (const char of line) {
                 if (char === '"') inQuotes = !inQuotes;
                 else if (char === ',' && !inQuotes) {
                   parts.push(current.trim());

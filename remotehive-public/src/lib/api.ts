@@ -120,7 +120,7 @@ export async function getJobs(filters?: {
 
   if (filters?.date_posted && filters.date_posted !== 'all') {
     const now = new Date();
-    let pastDate = new Date();
+    const pastDate = new Date();
     
     if (filters.date_posted === '24h') {
       pastDate.setDate(now.getDate() - 1);

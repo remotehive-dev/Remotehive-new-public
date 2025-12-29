@@ -15,11 +15,11 @@ import { SectionOptions } from "./shared/section-options";
 export const SummarySection = () => {
   const setValue = useResumeStore((state) => state.setValue);
   const section = useResumeStore(
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+     
     (state) => state.resume.data.sections.summary ?? defaultSections.summary,
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+   
   const collapsed = useResumeStore((state) => state.collapsedSections.summary ?? false);
   const toggleCollapseSection = useResumeStore((state) => state.toggleCollapseSection);
 

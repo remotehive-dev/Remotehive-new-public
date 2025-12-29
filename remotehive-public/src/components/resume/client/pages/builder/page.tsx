@@ -74,7 +74,7 @@ export const BuilderPage = () => {
 
 export const builderLoader: LoaderFunction<ResumeDto> = async ({ params }) => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+     
     const id = params.id!;
 
     const resume = await queryClient.fetchQuery({

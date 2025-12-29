@@ -15,7 +15,7 @@ export const sortByDate = <T>(a: T, b: T, key: keyof T, desc = true) => {
   else return dayjs(a[key] as Date).isBefore(dayjs(b[key] as Date)) ? -1 : 1;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export const deepSearchAndParseDates = (obj: any, dateKeys: string[]): any => {
   if (typeof obj !== "object" || obj === null) {
     return obj;
