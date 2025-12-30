@@ -1,0 +1,12 @@
+Django>=5.0
+django-jazzmin
+django-cors-headers
+djangorestframework
+python-dotenv
+gunicorn
+uvicorn
+supabase
+requests
+psycopg2-binary
+dj-database-url
+whitenoise

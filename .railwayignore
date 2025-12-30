@@ -1,10 +1,10 @@
 # Node & Dependencies
 node_modules/
 **/node_modules/
-package.json
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
+# package.json
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
 
 # Build & Dist
 dist/
@@ -37,7 +37,7 @@ __pycache__/
 *.pyd
 
 # Monorepo: Exclude other services not needed for FastAPI backend
-backend_django/
-open-resume/
-remotehive-admin/
-remotehive-public/
+# backend_django/
+# open-resume/
+# remotehive-admin/
+# remotehive-public/

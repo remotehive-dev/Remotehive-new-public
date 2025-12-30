@@ -2,8 +2,8 @@ import { getSupabase } from "./supabase";
 import { storage, APPWRITE_BUCKET_ID, ID } from "./appwrite";
 import { Job } from "../types";
 
-export const BASE_URL = "http://localhost:8000";
-export const DJANGO_API_URL = "http://localhost:8001";
+export const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+export const DJANGO_API_URL = import.meta.env.VITE_DJANGO_API_URL || "http://localhost:8001";
 
 export async function getHealth(): Promise<{ status: string }> {
   const res = await fetch(`${BASE_URL}/health`);

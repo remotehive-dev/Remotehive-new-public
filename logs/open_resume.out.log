@@ -3,6 +3,6 @@
 > next dev -p 3001
 
 - ready started server on 0.0.0.0:3001, url: http://localhost:3001
-- [35mevent[39m compiled client and server successfully in 1489 ms (306 modules)
+- [35mevent[39m compiled client and server successfully in 2.1s (306 modules)
 - [36mwait[39m compiling...
-- [35mevent[39m compiled client and server successfully in 544 ms (306 modules)
+- [35mevent[39m compiled client and server successfully in 666 ms (306 modules)
