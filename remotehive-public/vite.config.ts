@@ -13,7 +13,10 @@ export default defineConfig({
     lingui(),
   ],
   resolve: {
+    dedupe: ['react', 'react-dom'],
     alias: {
+      react: path.resolve(__dirname, './node_modules/react'),
+      'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
       '@/client': path.resolve(__dirname, './src/components/resume/client'),
       '@/artboard': path.resolve(__dirname, './src/components/resume/artboard'),
       '@reactive-resume/schema': path.resolve(__dirname, './src/components/resume/libs/schema'),

@@ -2,7 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 // Protect all routes except public ones if any (e.g. api/webhooks)
 // For now, we want to protect the entire admin panel except sign-in/sign-up
-const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)']);
+const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)', '/health']);
 
 export default clerkMiddleware(
   async (auth, request) => {

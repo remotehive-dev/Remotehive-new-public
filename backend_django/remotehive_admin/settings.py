@@ -33,6 +33,9 @@ ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://remotehive-django-production.up.railway.app",
+    "https://admin.remotehive.in",
+    "https://employer.remotehive.in",
+    "https://remotehive.in",
 ]
 
 

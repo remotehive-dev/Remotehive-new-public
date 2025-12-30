@@ -7,7 +7,7 @@
     "dev": "vite --port 5173",
     "build": "vite build",
     "preview": "vite preview --port 5173",
-    "start": "vite preview --port $PORT --host",
+    "start": "serve -s dist",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -104,6 +104,7 @@
     "react-simple-code-editor": "^0.14.1",
     "react-zoom-pan-pinch": "^3.7.0",
     "sanitize-html": "^2.17.0",
+    "serve": "^14.2.5",
     "tailwind-merge": "^3.4.0",
     "unique-names-generator": "^4.7.1",
     "use-breakpoint": "^4.0.10",
