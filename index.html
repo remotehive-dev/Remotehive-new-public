@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RemoteHive Public</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Load Google Maps API explicitly to ensure availability -->
+    <!-- API Key should be handled via environment variables and loaded dynamically in the app if possible -->
+    <script>
+      // Function to dynamically load the Google Maps script
+      function loadGoogleMaps() {
+        if (window.google && window.google.maps) return; // Already loaded
+        
+        // Use environment variable if available, otherwise fallback to empty (which will fail but is safe)
+        // In Vite, we can use %VITE_GOOGLE_MAPS_API_KEY% which will be replaced at build time
+        const apiKey = "%VITE_GOOGLE_MAPS_API_KEY%"; 
+        
+        if (!apiKey || apiKey.startsWith("%")) {
+            console.warn("Google Maps API Key not found. Maps features may not work.");
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+      loadGoogleMaps();
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+  </html>
+

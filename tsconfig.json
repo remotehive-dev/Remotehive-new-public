@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@reactive-resume/schema": ["./src/components/resume/libs/schema"],
+      "@reactive-resume/parser": ["./src/components/resume/libs/parser"],
+      "@reactive-resume/dto": ["./src/components/resume/libs/dto"],
+      "@reactive-resume/ui": ["./src/components/resume/libs/ui"],
+      "@reactive-resume/utils": ["./src/components/resume/libs/utils"],
+      "@reactive-resume/hooks": ["./src/components/resume/libs/hooks"],
+      "@/client/*": ["./src/components/resume/client/*"],
+      "@/artboard/*": ["./src/components/resume/artboard/*"]
+    }
+  },
+  "include": ["src", "vite.config.ts"]
+}
+
