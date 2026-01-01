@@ -168,8 +168,11 @@ def home_page_config_api(request):
     config = HomePageConfiguration.objects.first()
     
     # Fetch roles, regions, and footer links
+    from autoscraper.models import CompanyCategory
+    
     roles = []
     regions = []
+    quick_filters = []
     footer_links = {
         'platform': [],
         'support': [],
@@ -177,6 +180,18 @@ def home_page_config_api(request):
         'social': []
     }
     
+    # Fetch Quick Filters (Company Categories)
+    # We use top 12 ordered categories
+    cats = CompanyCategory.objects.filter(is_active=True).order_by('order')[:12]
+    for cat in cats:
+        quick_filters.append({
+            "name": cat.name,
+            "icon": cat.icon or "Briefcase", # Default icon
+            "href": f"/jobs?category={cat.slug}",
+            # Generate a consistent color based on ID or just default
+            "color": "bg-indigo-50 text-indigo-600" 
+        })
+
     if config:
         for r in config.roles.filter(is_active=True).order_by('order'):
             roles.append({
@@ -278,7 +293,8 @@ def home_page_config_api(request):
             "links": footer_links
         },
         "roles": roles,
-        "regions": regions
+        "regions": regions,
+        "quick_filters": quick_filters
     }
     
     response = JsonResponse(data)

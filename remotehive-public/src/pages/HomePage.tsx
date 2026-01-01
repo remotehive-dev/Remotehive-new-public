@@ -154,7 +154,7 @@ export function HomePage() {
           roles={roles.map(r => ({ label: r.label, value: r.value }))}
           locations={regions.map(r => ({ label: r.label, value: r.value }))}
         />
-        <QuickFilters />
+        <QuickFilters filters={config?.quick_filters} />
 
         {/* Stats */}
         <div className="mt-12 grid grid-cols-2 gap-8 md:grid-cols-4 border-t border-slate-100/50 pt-8 backdrop-blur-sm">

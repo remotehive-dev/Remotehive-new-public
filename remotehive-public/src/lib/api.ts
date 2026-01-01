@@ -31,7 +31,8 @@ export const djangoApiUrl = (path: string) => {
   
   // HACK: Redirect /api/ calls to FastAPI instead of Django
   // This allows us to migrate endpoints one by one without changing every call site immediately
-  if (path.includes('/api/home-config/') || path.includes('/api/seo-config/') || path.includes('/api/company-categories/')) {
+  // NOTE: home-config and company-categories removed from redirect to allow Django Admin control
+  if (path.includes('/api/seo-config/')) {
       // console.log(`[API] Redirecting ${path} to FastAPI`);
       return BASE_URL ? `${BASE_URL}${normalizedPath}` : normalizedPath;
   }
