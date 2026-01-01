@@ -12,13 +12,14 @@ const prodDefaultBaseUrl = "https://fastapi-production-2b1a.up.railway.app";
 const prodDefaultDjangoUrl = "https://remotehive-django-production.up.railway.app";
 
 const isProd = import.meta.env.PROD;
+const isRailway = typeof window !== 'undefined' && window.location.hostname.includes('railway.app');
 
 export const BASE_URL = normalizeBaseUrl(
-  import.meta.env.VITE_API_URL || (isProd ? prodDefaultBaseUrl : devDefaultBaseUrl),
+  import.meta.env.VITE_API_URL || (isProd || isRailway ? prodDefaultBaseUrl : devDefaultBaseUrl),
 );
 
 export const DJANGO_API_URL = normalizeBaseUrl(
-  import.meta.env.VITE_DJANGO_API_URL || (isProd ? prodDefaultDjangoUrl : devDefaultDjangoUrl),
+  import.meta.env.VITE_DJANGO_API_URL || (isProd || isRailway ? prodDefaultDjangoUrl : devDefaultDjangoUrl),
 );
 
 export const apiUrl = (path: string) => {

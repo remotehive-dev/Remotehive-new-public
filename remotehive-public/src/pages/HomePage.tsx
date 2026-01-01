@@ -42,6 +42,12 @@ interface HomeConfig {
   };
   roles: RoleConfig[];
   regions: RegionConfig[];
+  quick_filters?: Array<{
+    name: string;
+    icon: string;
+    href: string;
+    color: string;
+  }>;
 }
 
 // Icon mapper for dynamic icons
@@ -63,7 +69,9 @@ export function HomePage() {
 
       // 1. Fetch Config (Non-blocking)
       try {
-        const configRes = await fetch(djangoApiUrl('/api/home-config/'));
+        const url = djangoApiUrl('/api/home-config/');
+        console.log('Fetching home config from:', url);
+        const configRes = await fetch(url);
         if (configRes.ok) {
           const configData = await configRes.json();
           setConfig(configData);
