@@ -2,11 +2,42 @@ import { getSupabase } from "./supabase";
 import { storage, APPWRITE_BUCKET_ID, ID } from "./appwrite";
 import { Job } from "../types";
 
-export const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-export const DJANGO_API_URL = import.meta.env.VITE_DJANGO_API_URL || "http://localhost:8001";
+const normalizeBaseUrl = (value: string) => value.replace(/\/+$/, "");
+
+const devDefaultBaseUrl = "http://localhost:8000";
+const devDefaultDjangoUrl = "http://localhost:8001";
+
+// Production Fallbacks (Railway)
+const prodDefaultBaseUrl = "https://fastapi-production-2b1a.up.railway.app";
+const prodDefaultDjangoUrl = "https://remotehive-django-production.up.railway.app";
+
+const isProd = import.meta.env.PROD;
+
+export const BASE_URL = normalizeBaseUrl(
+  import.meta.env.VITE_API_URL || (isProd ? prodDefaultBaseUrl : devDefaultBaseUrl),
+);
+
+export const DJANGO_API_URL = normalizeBaseUrl(
+  import.meta.env.VITE_DJANGO_API_URL || (isProd ? prodDefaultDjangoUrl : devDefaultDjangoUrl),
+);
+
+export const apiUrl = (path: string) => {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return BASE_URL ? `${BASE_URL}${normalizedPath}` : normalizedPath;
+};
+
+export const djangoApiUrl = (path: string) => {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  // HACK: Redirect /api/ calls to FastAPI instead of Django
+  // This allows us to migrate endpoints one by one without changing every call site immediately
+  if (path.includes('/api/home-config/') || path.includes('/api/seo-config/') || path.includes('/api/company-categories/')) {
+      return BASE_URL ? `${BASE_URL}${normalizedPath}` : normalizedPath;
+  }
+  return DJANGO_API_URL ? `${DJANGO_API_URL}${normalizedPath}` : normalizedPath;
+};
 
 export async function getHealth(): Promise<{ status: string }> {
-  const res = await fetch(`${BASE_URL}/health`);
+  const res = await fetch(apiUrl("/health"));
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return res.json();
 }
@@ -31,7 +62,7 @@ export interface SEOConfig {
 
 export async function fetchSEOConfig(): Promise<SEOConfig | null> {
   try {
-    const res = await fetch(`${DJANGO_API_URL}/api/seo-config/`);
+    const res = await fetch(djangoApiUrl("/api/seo-config/"));
     if (!res.ok) return null;
     return await res.json();
   } catch (error) {
@@ -58,7 +89,7 @@ export interface CompanyCategory {
 
 export async function getCompanyCategories(): Promise<CompanyCategory[]> {
   try {
-    const res = await fetch(`${DJANGO_API_URL}/api/company-categories/`);
+    const res = await fetch(djangoApiUrl("/api/company-categories/"));
     if (!res.ok) return [];
     return await res.json();
   } catch (error) {
@@ -137,6 +168,10 @@ export async function getJobs(filters?: {
 
   if (error) {
     console.error('Error fetching jobs:', error);
+    return [];
+  }
+
+  if (!data || data.length === 0) {
     return [];
   }
 

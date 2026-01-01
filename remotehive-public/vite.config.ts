@@ -15,8 +15,6 @@ export default defineConfig({
   resolve: {
     dedupe: ['react', 'react-dom'],
     alias: {
-      react: path.resolve(__dirname, './node_modules/react'),
-      'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
       '@/client': path.resolve(__dirname, './src/components/resume/client'),
       '@/artboard': path.resolve(__dirname, './src/components/resume/artboard'),
       '@reactive-resume/schema': path.resolve(__dirname, './src/components/resume/libs/schema'),
@@ -33,7 +31,6 @@ export default defineConfig({
   define: {
     'process.env': {},
     'global': 'window',
-    'exports': {},
   },
   build: {
     commonjsOptions: {
@@ -42,12 +39,11 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-        },
+        manualChunks: undefined,
       },
     },
   },
+  // Optimize deps to avoid issues with some packages
   optimizeDeps: {
     include: ['pdfjs-dist', 'cookie'],
     exclude: ['path', 'url', 'fs'],

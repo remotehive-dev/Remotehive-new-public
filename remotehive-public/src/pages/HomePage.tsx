@@ -11,7 +11,7 @@ import { JobCategorySection } from '../components/JobCategorySection';
 import { RecommendedJobs } from '../components/RecommendedJobs';
 import { BackgroundElements } from '../components/BackgroundElements';
 import { Job } from '../types';
-import { getJobs, getUserByClerkId } from '../lib/api';
+import { djangoApiUrl, getJobs, getUserByClerkId } from '../lib/api';
 import { Loader2, Code2, Briefcase, Rocket, Globe, Laptop, Database, Search, User, Zap, BarChart, PenTool } from 'lucide-react';
 import { useUser, useAuth } from "@clerk/clerk-react";
 
@@ -60,31 +60,40 @@ export function HomePage() {
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
+
+      // 1. Fetch Config (Non-blocking)
       try {
-        // 1. Fetch Config from Django Admin API (Port 8001)
-        const configRes = await fetch('http://localhost:8001/api/home-config/');
+        const configRes = await fetch(djangoApiUrl('/api/home-config/'));
         if (configRes.ok) {
           const configData = await configRes.json();
           setConfig(configData);
         } else {
           console.warn('Failed to fetch home config:', configRes.status);
         }
+      } catch (err) {
+        console.warn('Failed to load home config (using defaults)', err);
+      }
 
-        // 2. Fetch Recent Jobs
+      // 2. Fetch Recent Jobs (Independent)
+      try {
         const data = await getJobs();
         setRecentJobs(data.slice(0, 6)); // First 6 are most recent due to default sort
+      } catch (err) {
+        console.error('Failed to load recent jobs', err);
+      }
 
-        // 3. Fetch User Profile for Recommendations
-        if (user) {
+      // 3. Fetch User Profile for Recommendations (Independent)
+      if (user) {
+        try {
           const token = await getToken({ template: 'supabase' });
           const profile = await getUserByClerkId(user.id, token || undefined);
           setUserProfile(profile);
+        } catch (err) {
+          console.error('Failed to load user profile', err);
         }
-      } catch (err) {
-        console.error('Failed to load home data', err);
-      } finally {
-        setIsLoading(false);
       }
+      
+      setIsLoading(false);
     }
     loadData();
   }, [user]);

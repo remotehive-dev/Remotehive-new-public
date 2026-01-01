@@ -7,6 +7,7 @@ import unicorn from "eslint-plugin-unicorn";
 import lingui from "eslint-plugin-lingui";
 
 export default [
+  { ignores: ["dist/**", "coverage/**"] },
   {files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"]},
   { languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } } },
   {languageOptions: { globals: globals.browser }},

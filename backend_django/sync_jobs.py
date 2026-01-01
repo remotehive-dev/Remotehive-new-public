@@ -10,6 +10,10 @@ dotenv.load_dotenv(BASE_DIR / ".env")
 
 SUPABASE_URL = os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+if not SUPABASE_URL:
+    SUPABASE_URL = os.environ.get("SUPABASE_URL") or os.environ.get("VITE_SUPABASE_URL")
+if not SUPABASE_KEY:
+    SUPABASE_KEY = os.environ.get("SUPABASE_ANON_KEY") or os.environ.get("VITE_SUPABASE_ANON_KEY")
 
 def sync_supabase_jobs():
     if __name__ == "__main__":

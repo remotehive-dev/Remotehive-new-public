@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Mail, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { djangoApiUrl } from '../lib/api';
 
 export function ContactPage() {
   const [formData, setFormData] = useState({
@@ -19,8 +20,7 @@ export function ContactPage() {
     setErrorMsg('');
 
     try {
-      // Assuming Admin API is on port 8001
-      const res = await fetch('http://localhost:8001/api/support-ticket/', {
+      const res = await fetch(djangoApiUrl('/api/support-ticket/'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

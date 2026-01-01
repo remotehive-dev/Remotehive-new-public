@@ -30,14 +30,6 @@ export function CompanyDrawer({ company, isOpen, onClose }: CompanyDrawerProps) 
 
     const getLogoUrl = (company: Company) => {
         if (company.logo_url) return company.logo_url;
-        if (company.website_url) {
-            try {
-                const urlStr = company.website_url.startsWith('http') ? company.website_url : `https://${company.website_url}`;
-                const urlObj = new URL(urlStr);
-                const domain = urlObj.hostname.replace('www.', '');
-                return `https://logo.clearbit.com/${domain}`;
-            } catch (e) { }
-        }
         return `https://ui-avatars.com/api/?name=${company.name.charAt(0)}&background=random`;
     };
 
@@ -56,7 +48,15 @@ export function CompanyDrawer({ company, isOpen, onClose }: CompanyDrawerProps) 
                 <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
                     <div className="flex items-center gap-3">
                         <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg border border-slate-200 p-1">
-                            <img src={getLogoUrl(company)} alt={company.name} className="h-full w-full object-contain" />
+                            <img
+                                src={getLogoUrl(company)}
+                                alt={company.name}
+                                className="h-full w-full object-contain"
+                                onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = `https://ui-avatars.com/api/?name=${company.name.charAt(0)}&background=random`;
+                                }}
+                            />
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-slate-900">{company.name}</h2>

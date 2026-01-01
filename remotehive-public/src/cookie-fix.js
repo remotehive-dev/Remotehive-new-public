@@ -1,10 +1,17 @@
-import * as cookie from 'cookie-original';
+import { parse as parseFn, serialize as serializeFn, parseCookie as parseCookieFn, stringifyCookie as stringifyCookieFn, parseSetCookie as parseSetCookieFn, stringifySetCookie as stringifySetCookieFn } from 'cookie-original';
 
-export const parse = cookie.parse || cookie.default?.parse;
-export const serialize = cookie.serialize || cookie.default?.serialize;
-export const parseCookie = cookie.parseCookie || cookie.default?.parseCookie;
-export const stringifyCookie = cookie.stringifyCookie || cookie.default?.stringifyCookie;
-export const parseSetCookie = cookie.parseSetCookie || cookie.default?.parseSetCookie;
-export const stringifySetCookie = cookie.stringifySetCookie || cookie.default?.stringifySetCookie;
+export const parse = parseFn;
+export const serialize = serializeFn;
+export const parseCookie = parseCookieFn;
+export const stringifyCookie = stringifyCookieFn;
+export const parseSetCookie = parseSetCookieFn;
+export const stringifySetCookie = stringifySetCookieFn;
 
-export default cookie.default || cookie;
+export default {
+  parse: parseFn,
+  serialize: serializeFn,
+  parseCookie: parseCookieFn,
+  stringifyCookie: stringifyCookieFn,
+  parseSetCookie: parseSetCookieFn,
+  stringifySetCookie: stringifySetCookieFn,
+};

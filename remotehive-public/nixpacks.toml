@@ -1,13 +1,11 @@
-providers = ["node"]
-
 [phases.setup]
-nixPkgs = ["nodejs"]
+nixPkgs = ["nodejs_20"]
 
 [phases.install]
-cmds = ["npm install --no-audit --no-fund"]
+cmds = ["npm ci"]
 
 [phases.build]
-cmds = ["./build.sh"]
+cmds = ["npm run build"]
 
 [start]
-cmd = "npm start"
+cmd = "serve -s dist -l tcp://0.0.0.0:$PORT"

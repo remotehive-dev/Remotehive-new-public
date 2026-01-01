@@ -1,5 +1,5 @@
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Any
 from datetime import datetime
 from uuid import UUID
@@ -13,9 +13,18 @@ class CompanyBase(BaseModel):
     description: Optional[str] = None
     rating: Optional[float] = 0.0
     review_count: Optional[int] = 0
-    tags: List[str] = []
+    tags: List[str] = Field(default_factory=list)
     type: Optional[str] = None
-    locations: List[str] = []
+    locations: List[str] = Field(default_factory=list)
+
+    @field_validator("tags", "locations", mode="before")
+    @classmethod
+    def _coerce_company_lists(cls, v):
+        if v is None:
+            return []
+        if isinstance(v, str):
+            return [v]
+        return v
 
 class CompanyUpdate(CompanyBase):
     name: Optional[str] = None
@@ -37,10 +46,19 @@ class JobBase(BaseModel):
     type: Optional[str] = None
     salary_range: Optional[str] = None
     description: Optional[str] = None
-    requirements: List[str] = []
-    benefits: List[str] = []
-    tags: List[str] = []
+    requirements: List[str] = Field(default_factory=list)
+    benefits: List[str] = Field(default_factory=list)
+    tags: List[str] = Field(default_factory=list)
     status: str = 'active'
+
+    @field_validator("requirements", "benefits", "tags", mode="before")
+    @classmethod
+    def _coerce_job_lists(cls, v):
+        if v is None:
+            return []
+        if isinstance(v, str):
+            return [v]
+        return v
 
 class JobUpdate(JobBase):
     title: Optional[str] = None

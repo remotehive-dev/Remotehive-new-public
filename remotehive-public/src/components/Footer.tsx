@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { djangoApiUrl } from '../lib/api';
 
 interface FooterConfig {
   description: string;
@@ -21,7 +22,7 @@ export function Footer() {
   useEffect(() => {
     async function loadConfig() {
       try {
-        const res = await fetch('http://localhost:8001/api/home-config/');
+        const res = await fetch(djangoApiUrl('/api/home-config/'));
         if (res.ok) {
           const data = await res.json();
           if (data.footer) {

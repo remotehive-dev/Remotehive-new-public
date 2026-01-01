@@ -173,15 +173,7 @@ export function CompaniesPage() {
 
   const getLogoUrl = (company: Company) => {
     if (company.logo_url) return company.logo_url;
-    if (company.website_url) {
-      try {
-        const urlStr = company.website_url.startsWith('http') ? company.website_url : `https://${company.website_url}`;
-        const urlObj = new URL(urlStr);
-        const domain = urlObj.hostname.replace('www.', '');
-        return `https://logo.clearbit.com/${domain}`;
-      } catch (e) { }
-    }
-    return null;
+    return `https://ui-avatars.com/api/?name=${company.name.charAt(0)}&background=random`;
   };
 
   return (

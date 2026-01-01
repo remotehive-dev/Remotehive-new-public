@@ -55,17 +55,8 @@ export function JobCard({ job }: JobCardProps) {
                   alt={`${job.company_name} logo`}
                   className="h-full w-full object-contain rounded-lg"
                   onError={(e) => {
-                    // Try Clearbit as a last resort fallback if the main logo fails
                     const target = e.target as HTMLImageElement;
-                    if (!target.src.includes('ui-avatars')) {
-                        // Extract domain guess from company name
-                        const domain = job.company_name.toLowerCase().replace(/\s+/g, '') + '.com';
-                        target.src = `https://logo.clearbit.com/${domain}`;
-                        target.onerror = () => {
-                            // Final fallback to initials
-                            target.src = `https://ui-avatars.com/api/?name=${job.company_name.charAt(0)}&background=random`;
-                        };
-                    }
+                    target.src = `https://ui-avatars.com/api/?name=${job.company_name.charAt(0)}&background=random`;
                   }}
                 />
               ) : (

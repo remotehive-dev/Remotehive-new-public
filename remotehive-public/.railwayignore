@@ -1,8 +1,19 @@
-node_modules/
-dist/
-build/
-.git/
-.DS_Store
-.env
-.env.local
-.env.*
+# Ignore all files by default
+*
+
+# Whitelist essential files
+!/src/
+!/src/**
+!/public/
+!/public/**
+!package.json
+!package-lock.json
+!tsconfig.json
+!vite.config.ts
+!index.html
+!tailwind.config.ts
+!postcss.config.js
+!lingui.config.ts
+!nixpacks.toml
+!railway.json
+!Procfile

@@ -17,8 +17,16 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 dotenv.load_dotenv(BASE_DIR / ".env")
 
-SUPABASE_URL = os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
-SUPABASE_ANON_KEY = os.environ.get("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+SUPABASE_URL = (
+    os.environ.get("SUPABASE_URL")
+    or os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
+    or os.environ.get("VITE_SUPABASE_URL")
+)
+SUPABASE_ANON_KEY = (
+    os.environ.get("SUPABASE_ANON_KEY")
+    or os.environ.get("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+    or os.environ.get("VITE_SUPABASE_ANON_KEY")
+)
 
 @receiver(post_delete, sender=Job)
 def delete_job_from_supabase(sender, instance, **kwargs):
@@ -252,4 +260,3 @@ def delete_job_role_from_supabase(sender, instance, **kwargs):
             
     except Exception as e:
         print(f"Error syncing JobRole deletion to Supabase: {e}")
-

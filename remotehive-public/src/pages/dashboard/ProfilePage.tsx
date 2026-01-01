@@ -6,8 +6,43 @@ import { calculateProfileScore, getMissingMandatoryFields } from "../../lib/prof
 import { Resume } from "../../types/resume";
 import { sendOtp } from "../../lib/fast2sms";
 import { FileText, Upload, Check, Loader2, X, Briefcase, User, MapPin, Globe, Linkedin, Save, Sparkles, AlertTriangle, Trash2, Wand2, Map, ShieldCheck, RotateCw } from "lucide-react";
-import { usePlacesWidget } from "react-google-autocomplete";
 import { clsx } from "clsx";
+
+let googleMapsScriptLoadingPromise: Promise<void> | null = null;
+
+function loadGoogleMapsScript(apiKey: string) {
+  if (typeof window === "undefined") return Promise.resolve();
+  if ((window as any).google?.maps?.places) return Promise.resolve();
+
+  if (!googleMapsScriptLoadingPromise) {
+    googleMapsScriptLoadingPromise = new Promise<void>((resolve, reject) => {
+      const existing = document.querySelector<HTMLScriptElement>('script[data-remotehive-google-maps="true"]');
+      if (existing) {
+        if (existing.dataset.loaded === "true") {
+          resolve();
+          return;
+        }
+        existing.addEventListener("load", () => resolve(), { once: true });
+        existing.addEventListener("error", () => reject(new Error("Failed to load Google Maps script")), { once: true });
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.dataset.remotehiveGoogleMaps = "true";
+      script.async = true;
+      script.defer = true;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places&v=weekly&loading=async`;
+      script.addEventListener("load", () => {
+        script.dataset.loaded = "true";
+        resolve();
+      }, { once: true });
+      script.addEventListener("error", () => reject(new Error("Failed to load Google Maps script")), { once: true });
+      document.head.appendChild(script);
+    });
+  }
+
+  return googleMapsScriptLoadingPromise;
+}
 
 export function ProfilePage() {
   const { user } = useUser();
@@ -22,6 +57,8 @@ export function ProfilePage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [storageProvider, setStorageProvider] = useState<'supabase' | 'appwrite'>('supabase');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const addressSearchInputRef = useRef<HTMLInputElement>(null);
+  const addressAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   
   // Phone Verification State
   const [isVerifyingPhone, setIsVerifyingPhone] = useState(false);
@@ -69,56 +106,85 @@ export function ProfilePage() {
     { code: "AE", name: "United Arab Emirates", dial_code: "+971" },
   ];
 
-  const { ref: materialRef } = usePlacesWidget({
-    apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    onPlaceSelected: (place: any) => {
-      if (!place.address_components || !place.geometry) return;
+  useEffect(() => {
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
+    const input = addressSearchInputRef.current;
+    if (!apiKey || !input) return;
 
-      const addressComponents = place.address_components;
-      let address1 = "";
-      let city = "";
-      let state = "";
-      let zipCode = "";
-      let country = "";
+    let cancelled = false;
 
-      addressComponents.forEach((component: any) => {
-        const types = component.types;
-        if (types.includes("street_number")) {
-          address1 = component.long_name + " " + address1;
-        }
-        if (types.includes("route")) {
-          address1 += component.long_name;
-        }
-        if (types.includes("locality")) {
-          city = component.long_name;
-        }
-        if (types.includes("administrative_area_level_1")) {
-          state = component.long_name;
-        }
-        if (types.includes("postal_code")) {
-          zipCode = component.long_name;
-        }
-        if (types.includes("country")) {
-          country = component.long_name;
-        }
-      });
+    loadGoogleMapsScript(apiKey)
+      .then(() => {
+        if (cancelled) return;
+        if (!(window as any).google?.maps?.places) return;
+        if (addressAutocompleteRef.current) return;
 
-      setFormData(prev => ({
-        ...prev,
-        address_line1: address1.trim(),
-        city,
-        state,
-        zip_code: zipCode,
-        country,
-        latitude: place.geometry.location.lat(),
-        longitude: place.geometry.location.lng()
-      }));
-    },
-    options: {
-      types: ["geocode"],
-      componentRestrictions: { country: "in" },
-    }
-  });
+        const autocomplete = new google.maps.places.Autocomplete(input, {
+          types: ["geocode"],
+          componentRestrictions: { country: "in" },
+        });
+
+        addressAutocompleteRef.current = autocomplete;
+
+        const listener = autocomplete.addListener("place_changed", () => {
+          const place = autocomplete.getPlace();
+          if (!place.address_components || !place.geometry) return;
+
+          const location = place.geometry?.location;
+          const addressComponents = place.address_components;
+          let address1 = "";
+          let city = "";
+          let state = "";
+          let zipCode = "";
+          let country = "";
+
+          addressComponents.forEach((component) => {
+            const types = component.types;
+            if (types.includes("street_number")) {
+              address1 = component.long_name + " " + address1;
+            }
+            if (types.includes("route")) {
+              address1 += component.long_name;
+            }
+            if (types.includes("locality")) {
+              city = component.long_name;
+            }
+            if (types.includes("administrative_area_level_1")) {
+              state = component.long_name;
+            }
+            if (types.includes("postal_code")) {
+              zipCode = component.long_name;
+            }
+            if (types.includes("country")) {
+              country = component.long_name;
+            }
+          });
+
+          setFormData((prev) => ({
+            ...prev,
+            address_line1: address1.trim(),
+            city,
+            state,
+            zip_code: zipCode,
+            country,
+            latitude: location?.lat?.() ?? prev.latitude,
+            longitude: location?.lng?.() ?? prev.longitude,
+          }));
+        });
+
+        (autocomplete as any).__remotehiveListener = listener;
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+      const autocomplete = addressAutocompleteRef.current as any;
+      if (autocomplete?.__remotehiveListener?.remove) {
+        autocomplete.__remotehiveListener.remove();
+      }
+      addressAutocompleteRef.current = null;
+    };
+  }, []);
 
   // GPS Location with Reverse Geocoding
   const handleGPSLocation = () => {
@@ -706,7 +772,7 @@ export function ProfilePage() {
                   <label className="block text-sm font-semibold text-gray-600 mb-2">Search Address</label>
                   <div className="relative">
                     <input 
-                      ref={materialRef as any}
+                      ref={addressSearchInputRef}
                       type="text"
                       placeholder="Start typing your address..."
                       className="neu-input pl-10"
