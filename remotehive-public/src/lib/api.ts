@@ -300,12 +300,18 @@ export async function getJob(id: string): Promise<Job | null> {
   } as Job;
 }
 
-export async function getCompanies() {
+export async function getCompanies(limit?: number) {
   const supabase = getSupabase();
-  const { data, error } = await supabase
+  let query = supabase
     .from('companies')
     .select('*')
     .order('name');
+
+  if (limit) {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('Error fetching companies:', error);
