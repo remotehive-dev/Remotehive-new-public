@@ -70,6 +70,7 @@ export function HomePage() {
       // 1. Fetch Config (Non-blocking)
       try {
         const url = djangoApiUrl('/api/home-config/');
+        // Force refresh
         console.log('Fetching home config from:', url);
         const configRes = await fetch(url);
         if (configRes.ok) {
