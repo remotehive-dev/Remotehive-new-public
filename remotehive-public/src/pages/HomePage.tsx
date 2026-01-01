@@ -76,8 +76,8 @@ export function HomePage() {
 
       // 2. Fetch Recent Jobs (Independent)
       try {
-        const data = await getJobs();
-        setRecentJobs(data.slice(0, 6)); // First 6 are most recent due to default sort
+        const data = await getJobs({ limit: 6 });
+        setRecentJobs(data);
       } catch (err) {
         console.error('Failed to load recent jobs', err);
       }

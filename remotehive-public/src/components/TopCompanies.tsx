@@ -11,7 +11,7 @@ export function TopCompanies() {
   useEffect(() => {
     async function fetchCompanies() {
       try {
-        const data = await getCompanies();
+        const data = await getCompanies(20);
         setCompanies(data || []);
       } catch (err) {
         console.error("Failed to load top companies", err);

@@ -28,9 +28,11 @@ export const apiUrl = (path: string) => {
 
 export const djangoApiUrl = (path: string) => {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  
   // HACK: Redirect /api/ calls to FastAPI instead of Django
   // This allows us to migrate endpoints one by one without changing every call site immediately
   if (path.includes('/api/home-config/') || path.includes('/api/seo-config/') || path.includes('/api/company-categories/')) {
+      // console.log(`[API] Redirecting ${path} to FastAPI`);
       return BASE_URL ? `${BASE_URL}${normalizedPath}` : normalizedPath;
   }
   return DJANGO_API_URL ? `${DJANGO_API_URL}${normalizedPath}` : normalizedPath;
@@ -108,6 +110,8 @@ export async function getJobs(filters?: {
   tenure?: string;
   salary_min?: number;
   date_posted?: '24h' | '7d' | '30d' | 'all';
+  limit?: number;
+  offset?: number;
 }): Promise<Job[]> {
   const supabase = getSupabase();
   let query = supabase
@@ -126,6 +130,11 @@ export async function getJobs(filters?: {
     `)
     .in('status', ['active', 'approved', 'published'])
     .order('posted_at', { ascending: false });
+
+  if (filters?.limit) {
+    const offset = filters.offset || 0;
+    query = query.range(offset, offset + filters.limit - 1);
+  }
 
   if (filters?.keyword) {
     query = query.ilike('title', `%${filters.keyword}%`);
