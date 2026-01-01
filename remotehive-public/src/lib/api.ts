@@ -18,9 +18,17 @@ export const BASE_URL = normalizeBaseUrl(
   import.meta.env.VITE_API_URL || (isProd || isRailway ? prodDefaultBaseUrl : devDefaultBaseUrl),
 );
 
-export const DJANGO_API_URL = normalizeBaseUrl(
+export let DJANGO_API_URL = normalizeBaseUrl(
   import.meta.env.VITE_DJANGO_API_URL || (isProd || isRailway ? prodDefaultDjangoUrl : devDefaultDjangoUrl),
 );
+
+// Fallback: If VITE_DJANGO_API_URL is set to a non-existent domain like admin.remotehive.in,
+// override it with the Railway URL in production to prevent DNS errors.
+if (isProd && DJANGO_API_URL.includes('admin.remotehive.in')) {
+  // console.warn('Overriding invalid DJANGO_API_URL with Railway production URL');
+  // @ts-ignore
+  DJANGO_API_URL = prodDefaultDjangoUrl;
+}
 
 export const apiUrl = (path: string) => {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
