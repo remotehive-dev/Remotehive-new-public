@@ -24,9 +24,8 @@ export let DJANGO_API_URL = normalizeBaseUrl(
 
 // Fallback: If VITE_DJANGO_API_URL is set to a non-existent domain like admin.remotehive.in,
 // override it with the Railway URL in production to prevent DNS errors.
-if (isProd && DJANGO_API_URL.includes('admin.remotehive.in')) {
-  // console.warn('Overriding invalid DJANGO_API_URL with Railway production URL');
-  // @ts-ignore
+if (isProd && (DJANGO_API_URL.includes('admin.remotehive.in') || DJANGO_API_URL.includes('remotehive-django-production.up.railway.app'))) {
+  // Ensure we use the correct Railway URL if the custom domain is failing or if we are on Railway
   DJANGO_API_URL = prodDefaultDjangoUrl;
 }
 
