@@ -31,12 +31,23 @@ DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
 ALLOWED_HOSTS = ["*"]
 
-CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://remotehive-public-production.up.railway.app",
+    "https://remotehive-admin-production.up.railway.app",
+    "https://admin.remotehive.in",
+    "https://employer.remotehive.in",
+    "https://remotehive.in",
+]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://remotehive-django-production.up.railway.app",
     "https://fastapi-production-2b1a.up.railway.app",
+    "https://remotehive-public-production.up.railway.app",
+    "https://remotehive-admin-production.up.railway.app",
     "https://admin.remotehive.in",
     "https://employer.remotehive.in",
     "https://remotehive.in",
