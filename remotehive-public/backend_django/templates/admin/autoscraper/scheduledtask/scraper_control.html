@@ -1,0 +1,151 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="scraper-control-panel">
+        <span style="display:none" id="csrf_token_storage">{{ csrf_token }}</span>
+        <h1>Scraper Control: {{ task.get_name_display }}</h1>
+    
+    <!-- Status Card -->
+    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px;">
+        <h2 style="margin-top: 0;">Engine Status</h2>
+        
+        <div id="status-badge" style="display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; background: #e9ecef; color: #495057;">
+            Unknown
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <div style="margin-bottom: 20px; border: 1px solid #eee; padding: 15px; border-radius: 5px; background: #f8f9fa;">
+                <h3 style="margin-top: 0; font-size: 16px; margin-bottom: 10px;">Run Configuration</h3>
+                <div style="margin-bottom: 10px; font-weight: bold; font-size: 14px;">Select Discovery Strategies:</div>
+                <div id="strategies-container">
+                    {% for value, label in discovery_strategies %}
+                    <div style="margin-bottom: 8px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" name="strategy" value="{{ value }}" checked style="margin-right: 10px;">
+                            <span style="font-size: 14px;">{{ label }}</span>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button id="btn-start" class="button" style="background: #28a745; color: white; padding: 10px 20px; border: none; font-size: 16px; cursor: pointer;">
+                Start Scraper Engine
+            </button>
+            <button id="btn-stop" class="button" style="background: #dc3545; color: white; padding: 10px 20px; border: none; font-size: 16px; cursor: pointer; display: none;">
+                Stop Engine
+            </button>
+        </div>
+    </div>
+    
+    <!-- Progress Bar -->
+    <div id="progress-container" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: none;">
+        <h3>Scraping Progress</h3>
+        
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span id="current-action">Initializing...</span>
+            <span id="stats-text">0 / 0 Companies</span>
+        </div>
+        
+        <div style="background: #e9ecef; height: 25px; border-radius: 12px; overflow: hidden;">
+            <div id="progress-bar" style="background: #007bff; height: 100%; width: 0%; transition: width 0.5s ease;"></div>
+        </div>
+        
+        <div style="margin-top: 15px; font-size: 14px; color: #666;">
+            Jobs Found: <strong id="jobs-found" style="color: #28a745;">0</strong>
+        </div>
+    </div>
+    
+    <!-- Config Summary -->
+    <div style="margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
+        <h3>Configuration</h3>
+        <p><strong>Interval:</strong> Every {{ task.interval_minutes }} minutes</p>
+        <p><strong>Target Companies:</strong> {{ task.target_companies.count }} selected</p>
+        <a href="../../{{ task.id }}/change/" class="button">Edit Configuration</a>
+    </div>
+</div>
+
+<script>
+    const TASK_ID = "{{ task.id }}";
+    const API_BASE = window.location.href.replace(/\/$/, ""); 
+    
+    function updateStatus() {
+        fetch(`${API_BASE}/status/`)
+        .then(res => res.json())
+        .then(data => {
+            const status = data.status;
+            const badge = document.getElementById('status-badge');
+            const btnStart = document.getElementById('btn-start');
+            const btnStop = document.getElementById('btn-stop');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            
+            // Update Badge
+            badge.innerText = status.toUpperCase();
+            if (status === 'running') {
+                badge.style.background = '#cce5ff';
+                badge.style.color = '#004085';
+                btnStart.style.display = 'none';
+                btnStop.style.display = 'inline-block';
+                progressContainer.style.display = 'block';
+            } else if (status === 'completed') {
+                badge.style.background = '#d4edda';
+                badge.style.color = '#155724';
+                btnStart.style.display = 'inline-block';
+                btnStop.style.display = 'none';
+                progressContainer.style.display = 'block';
+            } else {
+                badge.style.background = '#e9ecef';
+                badge.style.color = '#495057';
+                btnStart.style.display = 'inline-block';
+                btnStop.style.display = 'none';
+            }
+            
+            // Update Stats
+            if (data.progress !== undefined) {
+                progressBar.style.width = data.progress + '%';
+                document.getElementById('stats-text').innerText = `${data.processed} / ${data.total} Companies`;
+                document.getElementById('current-action').innerText = data.current_company ? `Scraping: ${data.current_company}` : 'Idle';
+                document.getElementById('jobs-found').innerText = data.jobs_found;
+            }
+            
+            // Poll if running
+            if (status === 'running') {
+                setTimeout(updateStatus, 2000);
+            }
+        });
+    }
+    
+    document.getElementById('btn-start').onclick = function() {
+        const strategies = [];
+        document.querySelectorAll('input[name="strategy"]:checked').forEach(cb => {
+            strategies.push(cb.value);
+        });
+
+        fetch(`${API_BASE}/start/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ strategies: strategies })
+        })
+        .then(res => res.json())
+        .then(() => {
+            updateStatus();
+        });
+    };
+    
+    document.getElementById('btn-stop').onclick = function() {
+        fetch(`${API_BASE}/stop/`)
+        .then(res => res.json())
+        .then(() => {
+            alert('Stop signal sent. Engine will stop after current operation.');
+        });
+    };
+    
+    // Initial Load
+    updateStatus();
+</script>
+{% endblock %}

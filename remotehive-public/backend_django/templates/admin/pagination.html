@@ -1,0 +1,32 @@
+{% load admin_list %}
+{% load i18n %}
+
+<div class="row">
+    <div class="col-12 col-sm-12 col-md-5">
+        <p class="m-0 text-muted">
+            {{ cl.result_count }} 
+            {% if cl.result_count == 1 %}
+                {% trans "entry" %}
+            {% else %}
+                {% trans "entries" %}
+            {% endif %}
+            
+            {% if show_all_url %}
+                &nbsp;&nbsp; <a href="{{ show_all_url }}" class="showall">{% trans "Show all" %}</a>
+            {% endif %}
+        </p>
+    </div>
+    
+    <div class="col-12 col-sm-12 col-md-7">
+        <ul class="pagination pagination-sm m-0 float-right">
+            {% if pagination_required %}
+                {% for i in page_range %}
+                    {# Fallback to standard django paginator_number but wrapped in li #}
+                    <li class="page-item">
+                        {% paginator_number cl i %}
+                    </li>
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,593 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content_title %}
+    <h1>Companies & Job Stats Dashboard</h1>
+{% endblock %}
+
+{% block result_list %}
+    <!-- Select2 CSS/JS for Searchable Dropdowns -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <style>
+        .select2-container--default .select2-selection--multiple {
+            border: 2px solid #d1d5db; /* Base border */
+            border-top-color: #9ca3af; /* Darker top/left */
+            border-left-color: #9ca3af;
+            border-right-color: #e5e7eb; /* Lighter bottom/right */
+            border-bottom-color: #e5e7eb;
+            border-radius: 4px;
+            min-height: 80px; 
+            max-height: 120px; /* Fix height */
+            overflow-y: auto; /* Enable scroll */
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.05); /* Subtle inner shadow for depth */
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #f3f4f6;
+            border: 1px solid #d1d5db;
+            color: #374151;
+            margin-top: 5px;
+        }
+    </style>
+
+    <!-- Scraper Control Panel -->
+    <div style="margin-bottom: 20px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 style="margin: 0; font-size: 18px; color: #333;">Scraper Engine Control</h2>
+            <div id="status-badge" style="padding: 5px 15px; border-radius: 20px; font-weight: bold; background: #e9ecef; color: #495057;">
+                Unknown
+            </div>
+        </div>
+
+        <!-- Google Custom Search Config (New) -->
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #4285f4;">
+             <h3 style="margin-top: 0; font-size: 15px; color: #4285f4; display: flex; align-items: center; gap: 8px;">
+                <i class="fab fa-google"></i> Google Custom Search Configuration
+             </h3>
+             <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                 <div style="flex: 1; min-width: 200px;">
+                     <label style="display: block; font-size: 12px; color: #666; margin-bottom: 4px;">Search Engine Name</label>
+                     <div style="font-weight: 600; color: #333;">Remotehive_scraper</div>
+                 </div>
+                 <div style="flex: 1; min-width: 200px;">
+                     <label style="display: block; font-size: 12px; color: #666; margin-bottom: 4px;">Search Engine ID</label>
+                     <div style="font-weight: 600; color: #333; font-family: monospace;">9719bae582bf849d7</div>
+                 </div>
+                 <div style="flex: 2; min-width: 300px;">
+                     <label style="display: block; font-size: 12px; color: #666; margin-bottom: 4px;">Public URL</label>
+                     <a href="https://cse.google.com/cse?cx=9719bae582bf849d7" target="_blank" style="color: #4285f4; text-decoration: none;">https://cse.google.com/cse?cx=9719bae582bf849d7 <i class="fas fa-external-link-alt" style="font-size: 10px;"></i></a>
+                 </div>
+             </div>
+        </div>
+
+        <!-- Scraper Config Options -->
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                <!-- Discovery Strategies -->
+                <div style="flex: 1; min-width: 250px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #333;">1. Discovery Strategies</h4>
+                    <div id="strategies-container" style="background: white; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; max-height: 150px; overflow-y: auto;">
+                        {% for value, label in discovery_strategies %}
+                        <div style="margin-bottom: 6px;">
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
+                                <input type="checkbox" name="strategy" value="{{ value }}" checked style="margin-right: 8px;">
+                                {{ label }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- API Channels -->
+                <div style="flex: 1; min-width: 250px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #333;">2. API Channels (Active)</h4>
+                    <div id="api-channels-container" style="background: white; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; max-height: 150px; overflow-y: auto;">
+                        {% for config in api_configs %}
+                        <div style="margin-bottom: 6px;">
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px;">
+                                <input type="checkbox" name="api_config" value="{{ config.id }}" checked style="margin-right: 8px;">
+                                <strong>{{ config.service_name|title }}</strong>: {{ config.name }}
+                            </label>
+                        </div>
+                        {% empty %}
+                        <div style="font-size: 13px; color: #999;">No active API configurations found.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Advanced Query Builder (Sentence Logic) -->
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e9ecef;">
+                <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #333;">3. Advanced Targeting (Sentence Builder)</h4>
+                
+                <div style="background: #fff; border: 1px solid #d1d5db; border-radius: 8px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                    <div style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 15px; border-bottom: 1px solid #f3f4f6; padding-bottom: 10px;">
+                        Query Builder
+                    </div>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; line-height: 2;">
+                        
+                        <!-- Clause 1: Roles -->
+                        <div style="display: flex; align-items: center; gap: 8px; background: #f9fafb; padding: 8px 12px; border-radius: 6px; border: 1px solid #e5e7eb;">
+                            <span style="color: #6b7280;">Find jobs where <strong>Role</strong> is</span>
+                            <div style="display: flex; flex-direction: column;">
+                                <select id="builder_roles" multiple style="min-width: 180px; height: 80px; border: 1px solid #d1d5db; border-radius: 4px; padding: 4px; font-size: 13px;">
+                                    <option value="select_all_option" style="font-weight: bold; color: blue;">Select All Roles</option>
+                                    {% for role in all_job_roles %}
+                                    <option value="{{ role.name }}">{{ role.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div style="display: flex; gap: 5px; margin-top: 2px;">
+                                    <a href="#" onclick="selectAll('builder_roles'); return false;" style="font-size: 11px; color: #2563eb;">Select All</a>
+                                    <span style="font-size: 11px; color: #ccc;">|</span>
+                                    <a href="#" onclick="deselectAll('builder_roles'); return false;" style="font-size: 11px; color: #2563eb;">None</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clause 2: Companies -->
+                        <div style="display: flex; align-items: center; gap: 8px; background: #f9fafb; padding: 8px 12px; border-radius: 6px; border: 1px solid #e5e7eb;">
+                            <span style="color: #6b7280;">at <strong>Companies</strong></span>
+                            <select id="builder_companies" multiple style="min-width: 180px; height: 80px; border: 1px solid #d1d5db; border-radius: 4px; padding: 4px; font-size: 13px;">
+                                <option value="all" selected>(All Scheduled Companies)</option>
+                                {% for comp in all_companies %}
+                                <option value="{{ comp.id }}">{{ comp.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Logic Operator -->
+                        <select id="logic_loc" style="font-weight: bold; color: #2563eb; border: 1px solid #bfdbfe; background: #eff6ff; padding: 5px 10px; border-radius: 20px; cursor: pointer; height: 32px;">
+                            <option value="AND">AND</option>
+                            <option value="OR">OR</option>
+                        </select>
+
+                        <!-- Clause 3: Locations -->
+                        <div style="display: flex; align-items: center; gap: 8px; background: #f9fafb; padding: 8px 12px; border-radius: 6px; border: 1px solid #e5e7eb;">
+                            <span style="color: #6b7280;">where <strong>Location</strong> is</span>
+                            <div style="display: flex; flex-direction: column;">
+                                <select id="builder_countries" multiple style="min-width: 180px; height: 80px; border: 1px solid #d1d5db; border-radius: 4px; padding: 4px; font-size: 13px;">
+                                    <option value="select_all_option" style="font-weight: bold; color: blue;">Select All Locations</option>
+                                    {% for country in all_countries %}
+                                    <option value="{{ country.name }}">{{ country.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div style="display: flex; gap: 5px; margin-top: 2px;">
+                                    <a href="#" onclick="selectAll('builder_countries'); return false;" style="font-size: 11px; color: #2563eb;">Select All</a>
+                                    <span style="font-size: 11px; color: #ccc;">|</span>
+                                    <a href="#" onclick="deselectAll('builder_countries'); return false;" style="font-size: 11px; color: #2563eb;">None</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Logic Operator -->
+                        <select id="logic_exp" style="font-weight: bold; color: #2563eb; border: 1px solid #bfdbfe; background: #eff6ff; padding: 5px 10px; border-radius: 20px; cursor: pointer; height: 32px;">
+                            <option value="AND">AND</option>
+                            <option value="OR">OR</option>
+                        </select>
+
+                        <!-- Clause 4: Experience -->
+                        <div style="display: flex; align-items: center; gap: 8px; background: #f9fafb; padding: 8px 12px; border-radius: 6px; border: 1px solid #e5e7eb;">
+                            <span style="color: #6b7280;"><strong>Experience</strong> is</span>
+                            <select id="builder_experience" style="border: 1px solid #d1d5db; border-radius: 4px; padding: 6px; font-size: 13px; min-width: 120px;">
+                                <option value="">(Any)</option>
+                                <option value="Senior">Senior / Lead</option>
+                                <option value="Mid">Mid-Level</option>
+                                <option value="Junior">Junior / Entry</option>
+                                <option value="Intern">Internship</option>
+                            </select>
+                        </div>
+
+                        <!-- Clause 5: Pages Limit -->
+                        <div style="display: flex; align-items: center; gap: 8px; background: #f9fafb; padding: 8px 12px; border-radius: 6px; border: 1px solid #e5e7eb;">
+                            <span style="color: #6b7280;"><strong>Pages to Crawl</strong></span>
+                            <input type="number" id="builder_limit" value="1" min="1" max="10" style="width: 50px; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px;">
+                        </div>
+
+                        <!-- Clause 6: Exclude -->
+                        <div style="display: flex; align-items: center; gap: 8px; background: #fef2f2; padding: 8px 12px; border-radius: 6px; border: 1px solid #fecaca;">
+                            <span style="color: #b91c1c; font-weight: 600;">BUT NOT</span>
+                            <span style="color: #7f1d1d;">containing</span>
+                            <input type="text" id="builder_exclude" placeholder="unpaid, volunteer..." style="padding: 6px; border: 1px solid #fca5a5; border-radius: 4px; width: 180px; font-size: 13px;">
+                        </div>
+
+                    </div>
+                    
+                    <div style="margin-top: 10px; font-size: 12px; color: #9ca3af; font-style: italic;">
+                        * Hold Ctrl (Windows) or Cmd (Mac) to select multiple items in the lists.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
+            <button id="btn-start" class="button" style="background: #28a745; color: white; padding: 10px 20px; border: none; font-size: 14px; cursor: pointer;">
+                <i class="fas fa-play"></i> Start Scraper Engine
+            </button>
+            <button id="btn-stop" class="button" style="background: #dc3545; color: white; padding: 10px 20px; border: none; font-size: 14px; cursor: pointer; display: none;">
+                <i class="fas fa-stop"></i> Stop Engine
+            </button>
+            
+            <form method="POST" action="update-interval/" style="display: flex; gap: 10px; align-items: center; margin-left: auto;">
+                {% csrf_token %}
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label style="color: #666;">Run Every:</label>
+                    <select name="interval" style="padding: 6px; border-radius: 4px; border: 1px solid #ced4da;">
+                        <option value="15" {% if scraper_task.interval_minutes == 15 %}selected{% endif %}>15 Minutes</option>
+                        <option value="30" {% if scraper_task.interval_minutes == 30 %}selected{% endif %}>30 Minutes</option>
+                        <option value="60" {% if scraper_task.interval_minutes == 60 %}selected{% endif %}>1 Hour</option>
+                        <option value="120" {% if scraper_task.interval_minutes == 120 %}selected{% endif %}>2 Hours</option>
+                        <option value="360" {% if scraper_task.interval_minutes == 360 %}selected{% endif %}>6 Hours</option>
+                        <option value="1440" {% if scraper_task.interval_minutes == 1440 %}selected{% endif %}>24 Hours</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="button" style="background: #007bff; color: white;">Save Config</button>
+            </form>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="progress-container" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 6px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #555;">
+                <span id="current-action">Initializing...</span>
+                <span id="stats-text">0 / 0 Companies</span>
+            </div>
+            <div style="background: #e9ecef; height: 20px; border-radius: 10px; overflow: hidden;">
+                <div id="progress-bar" style="background: #007bff; height: 100%; width: 0%; transition: width 0.5s ease;"></div>
+            </div>
+            <div style="margin-top: 8px; font-size: 13px;">
+                Jobs Found: <strong id="jobs-found" style="color: #28a745;">0</strong>
+            </div>
+            
+            <!-- Live Terminal Log -->
+            <div style="margin-top: 15px; background: #1e1e1e; color: #00ff00; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 12px; height: 150px; overflow-y: auto;" id="scraper-terminal">
+                <div style="color: #888;">> Scraper Engine Terminal Initialized...</div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 15px; font-size: 13px; color: #777; border-top: 1px solid #eee; padding-top: 10px;">
+            <strong>Configuration:</strong> Scraper will target <strong>{{ scraper_task.target_companies.count }}</strong> companies. 
+            Use the "Add to Scraper Engine Targets" action below to add more.
+        </div>
+    </div>
+    
+    <!-- Company Enrichment Scraper -->
+    <div style="margin-bottom: 20px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 style="margin: 0; font-size: 18px; color: #333;">Company Enrichment Scraper</h2>
+            <div id="enrich-status-badge" style="padding: 5px 15px; border-radius: 20px; font-weight: bold; background: #e9ecef; color: #495057;">
+                Unknown
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
+            <button id="btn-enrich-start" class="button" style="background: #6610f2; color: white; padding: 10px 20px; border: none; font-size: 14px; cursor: pointer;">
+                <i class="fas fa-magic"></i> Start Enrichment
+            </button>
+            <button id="btn-enrich-stop" class="button" style="background: #dc3545; color: white; padding: 10px 20px; border: none; font-size: 14px; cursor: pointer; display: none;">
+                <i class="fas fa-stop"></i> Stop Enrichment
+            </button>
+            
+            <div style="margin-left: auto; color: #666; font-size: 13px; max-width: 400px;">
+                This scraper will fetch <strong>Logo, Industry, Employees, Founded Year, and Social Links</strong> for companies that are missing this data.
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="enrich-progress-container" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 6px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #555;">
+                <span id="enrich-current-action">Initializing...</span>
+                <span id="enrich-stats-text">0 / 0 Companies</span>
+            </div>
+            <div style="background: #e9ecef; height: 20px; border-radius: 10px; overflow: hidden;">
+                <div id="enrich-progress-bar" style="background: #6610f2; height: 100%; width: 0%; transition: width 0.5s ease;"></div>
+            </div>
+            <div style="margin-top: 8px; font-size: 13px;">
+                Enriched: <strong id="enrich-found" style="color: #6610f2;">0</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Stats Area -->
+    <div style="margin-bottom: 30px; background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            
+            <!-- Key Metrics -->
+            <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid #007bff;">
+                <h3 style="margin: 0 0 10px 0; color: #6c757d; font-size: 14px; text-transform: uppercase;">Total Companies</h3>
+                <p style="font-size: 28px; font-weight: bold; margin: 0; color: #343a40;">{{ dashboard_stats.total_companies }}</p>
+            </div>
+
+            <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid #28a745;">
+                <h3 style="margin: 0 0 10px 0; color: #6c757d; font-size: 14px; text-transform: uppercase;">Total Jobs Scraped</h3>
+                <p style="font-size: 28px; font-weight: bold; margin: 0; color: #343a40;">{{ dashboard_stats.total_jobs }}</p>
+            </div>
+
+            <!-- Top Roles -->
+            <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); grid-column: span 2;">
+                <h3 style="margin: 0 0 15px 0; color: #6c757d; font-size: 14px; text-transform: uppercase;">Jobs by Role (Top Keywords)</h3>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    {% for role, count in dashboard_stats.roles_stats.items %}
+                    <div style="flex: 1; min-width: 80px; text-align: center; background: #e9ecef; padding: 10px; border-radius: 4px;">
+                        <div style="font-size: 12px; color: #495057;">{{ role }}</div>
+                        <div style="font-size: 18px; font-weight: bold; color: #007bff;">{{ count }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Top Regions -->
+            <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); grid-column: span 2;">
+                <h3 style="margin: 0 0 15px 0; color: #6c757d; font-size: 14px; text-transform: uppercase;">Top Regions</h3>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    {% for region in dashboard_stats.top_regions %}
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f3f5; padding-bottom: 5px;">
+                        <span style="color: #495057;">{{ region.location|default:"Unknown" }}</span>
+                        <span style="font-weight: bold; color: #28a745;">{{ region.count }} jobs</span>
+                    </div>
+                    {% empty %}
+                    <p style="color: #999;">No region data available yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Original Change List -->
+    {{ block.super }}
+
+    <script>
+        function selectAll(id) {
+            $(`#${id} > option`).prop("selected", true);
+            $(`#${id}`).trigger("change");
+        }
+
+        function deselectAll(id) {
+            $(`#${id} > option`).prop("selected", false);
+            $(`#${id}`).trigger("change");
+        }
+        
+        const TASK_ID = "{{ scraper_task.id }}";
+        const API_BASE = "/admin/autoscraper/scheduledtask/control/" + TASK_ID; 
+        
+        // Initialize Select2
+        $(document).ready(function() {
+            $('#builder_companies').select2({
+                placeholder: "Search and select companies...",
+                width: '300px' // Adjust width to fit container better
+            });
+            // Optional: Also for Roles and Countries if user wants
+            var rolesSelect = $('#builder_roles').select2({
+                placeholder: "Select roles...",
+                width: '200px'
+            });
+
+            // Handle "Select All" option inside dropdown
+            rolesSelect.on('select2:select', function (e) {
+                var data = e.params.data;
+                if (data.id === 'select_all_option') {
+                    // Select all real options
+                    var allOptions = [];
+                    $('#builder_roles option').each(function() {
+                        if (this.value !== 'select_all_option') {
+                            allOptions.push(this.value);
+                        }
+                    });
+                    $('#builder_roles').val(allOptions).trigger('change');
+                }
+            });
+
+            var countriesSelect = $('#builder_countries').select2({
+                placeholder: "Select locations...",
+                width: '200px'
+            });
+
+            // Handle "Select All" option inside Location dropdown
+            countriesSelect.on('select2:select', function (e) {
+                var data = e.params.data;
+                if (data.id === 'select_all_option') {
+                    // Select all real options
+                    var allOptions = [];
+                    $('#builder_countries option').each(function() {
+                        if (this.value !== 'select_all_option') {
+                            allOptions.push(this.value);
+                        }
+                    });
+                    $('#builder_countries').val(allOptions).trigger('change');
+                }
+            });
+        });
+        
+        function updateStatus() {
+            fetch(`${API_BASE}/status/`)
+            .then(res => res.json())
+            .then(data => {
+                const status = data.status;
+                const badge = document.getElementById('status-badge');
+                const btnStart = document.getElementById('btn-start');
+                const btnStop = document.getElementById('btn-stop');
+                const progressContainer = document.getElementById('progress-container');
+                const progressBar = document.getElementById('progress-bar');
+                
+                // Update Badge
+                if (status) {
+                    badge.innerText = status.toUpperCase();
+                    if (status === 'running') {
+                        badge.style.background = '#cce5ff';
+                        badge.style.color = '#004085';
+                        btnStart.style.display = 'none';
+                        btnStop.style.display = 'inline-block';
+                        progressContainer.style.display = 'block';
+                    } else if (status === 'completed') {
+                        badge.style.background = '#d4edda';
+                        badge.style.color = '#155724';
+                        btnStart.style.display = 'inline-block';
+                        btnStop.style.display = 'none';
+                        progressContainer.style.display = 'block';
+                    } else {
+                        badge.style.background = '#e9ecef';
+                        badge.style.color = '#495057';
+                        btnStart.style.display = 'inline-block';
+                        btnStop.style.display = 'none';
+                    }
+                }
+                
+                // Update Stats
+                if (data.progress !== undefined) {
+                    progressBar.style.width = data.progress + '%';
+                    document.getElementById('stats-text').innerText = `${data.processed} / ${data.total} Companies`;
+                    document.getElementById('current-action').innerText = data.current_company ? `Scraping: ${data.current_company}` : 'Idle';
+                    document.getElementById('jobs-found').innerText = data.jobs_found;
+                    
+                    // Update Terminal
+                    if (data.message) {
+                        const terminal = document.getElementById('scraper-terminal');
+                        const lastMsg = terminal.lastElementChild?.innerText;
+                        if (lastMsg !== `> ${data.message}`) {
+                            const line = document.createElement('div');
+                            line.innerText = `> ${data.message}`;
+                            terminal.appendChild(line);
+                            terminal.scrollTop = terminal.scrollHeight;
+                        }
+                    }
+                }
+                
+                // Poll if running
+                if (status === 'running') {
+                    setTimeout(updateStatus, 2000);
+                }
+            });
+        }
+        
+        document.getElementById('btn-start').onclick = function() {
+        const strategies = [];
+        document.querySelectorAll('input[name="strategy"]:checked').forEach(cb => {
+            strategies.push(cb.value);
+        });
+
+        const apiConfigs = [];
+        document.querySelectorAll('input[name="api_config"]:checked').forEach(cb => {
+            apiConfigs.push(cb.value);
+        });
+
+        // Collect Advanced Builder Data
+        // Need to use jQuery to get values from Select2 correctly
+        const advancedFilters = {
+            roles: $('#builder_roles').val(),
+            companies: $('#builder_companies').val(),
+            logic_loc: document.getElementById('logic_loc').value,
+            locations: $('#builder_countries').val(),
+            logic_exp: document.getElementById('logic_exp').value,
+            experience: document.getElementById('builder_experience').value,
+            page_limit: document.getElementById('builder_limit').value,
+            exclude: document.getElementById('builder_exclude').value
+        };
+
+        // Get CSRF Token from cookie or DOM
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch(`${API_BASE}/start/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ 
+                strategies: strategies,
+                api_configs: apiConfigs,
+                advanced_filters: advancedFilters
+            })
+        })
+        .then(res => res.json())
+        .then(() => {
+            updateStatus();
+        });
+    };
+        
+        document.getElementById('btn-stop').onclick = function() {
+            fetch(`${API_BASE}/stop/`)
+            .then(res => res.json())
+            .then(() => {
+                alert('Stop signal sent. Engine will stop after current operation.');
+            });
+        };
+        
+        // Initial Load
+        updateStatus();
+        
+        // Enrichment Scraper Logic
+        const ENRICH_TASK_ID = "{{ enrich_task.id }}";
+        const ENRICH_API_BASE = "/admin/autoscraper/scheduledtask/control/" + ENRICH_TASK_ID; 
+        
+        function updateEnrichStatus() {
+            fetch(`${ENRICH_API_BASE}/status/`)
+            .then(res => res.json())
+            .then(data => {
+                const status = data.status;
+                const badge = document.getElementById('enrich-status-badge');
+                const btnStart = document.getElementById('btn-enrich-start');
+                const btnStop = document.getElementById('btn-enrich-stop');
+                const progressContainer = document.getElementById('enrich-progress-container');
+                const progressBar = document.getElementById('enrich-progress-bar');
+                
+                // Update Badge
+                if (status) {
+                    badge.innerText = status.toUpperCase();
+                    if (status === 'running') {
+                        badge.style.background = '#e0cffc';
+                        badge.style.color = '#5a1e96';
+                        btnStart.style.display = 'none';
+                        btnStop.style.display = 'inline-block';
+                        progressContainer.style.display = 'block';
+                    } else if (status === 'completed') {
+                        badge.style.background = '#d4edda';
+                        badge.style.color = '#155724';
+                        btnStart.style.display = 'inline-block';
+                        btnStop.style.display = 'none';
+                        progressContainer.style.display = 'block';
+                    } else {
+                        badge.style.background = '#e9ecef';
+                        badge.style.color = '#495057';
+                        btnStart.style.display = 'inline-block';
+                        btnStop.style.display = 'none';
+                    }
+                }
+                
+                // Update Stats
+                if (data.progress !== undefined) {
+                    progressBar.style.width = data.progress + '%';
+                    document.getElementById('enrich-stats-text').innerText = `${data.processed} / ${data.total} Companies`;
+                    document.getElementById('enrich-current-action').innerText = data.current_company ? `Enriching: ${data.current_company}` : 'Idle';
+                    document.getElementById('enrich-found').innerText = data.jobs_found; // We reuse this field for success count
+                }
+                
+                // Poll if running
+                if (status === 'running') {
+                    setTimeout(updateEnrichStatus, 2000);
+                }
+            });
+        }
+        
+        document.getElementById('btn-enrich-start').onclick = function() {
+            fetch(`${ENRICH_API_BASE}/start/`)
+            .then(res => res.json())
+            .then(() => {
+                updateEnrichStatus();
+            });
+        };
+        
+        document.getElementById('btn-enrich-stop').onclick = function() {
+            fetch(`${ENRICH_API_BASE}/stop/`)
+            .then(res => res.json())
+            .then(() => {
+                alert('Stop signal sent. Engine will stop after current operation.');
+            });
+        };
+        
+        updateEnrichStatus();
+    </script>
+{% endblock %}

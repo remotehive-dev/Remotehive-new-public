@@ -1,0 +1,36 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+<style>
+    /* Adjust Swagger UI to fit inside Django Admin */
+    .swagger-ui .wrapper { padding: 0; max-width: 100%; }
+    .swagger-ui .info { margin: 20px 0; }
+    #swagger-ui { margin: 20px; background: white; padding: 20px; border-radius: 8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="swagger-ui"></div>
+
+<script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js" crossorigin></script>
+<script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js" crossorigin></script>
+<script>
+window.onload = () => {
+  window.ui = SwaggerUIBundle({
+    url: "{{ openapi_url }}",
+    dom_id: '#swagger-ui',
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIStandalonePreset
+    ],
+    layout: "BaseLayout",
+    deepLinking: true,
+    showExtensions: true,
+    showCommonExtensions: true
+  });
+};
+</script>
+{% endblock %}
